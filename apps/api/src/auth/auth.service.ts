@@ -6,21 +6,17 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { AuthUserDto } from 'src/users/dto/user.dto';
-import { UsersService } from 'src/users/users.service';
+import { AuthUserDto } from 'src/user/dto/user.dto';
 import * as bcrypt from 'bcrypt';
-import { EventsService } from 'src/events/events.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
-    private readonly eventsService: EventsService,
   ) {}
 
-  async authenticate(auth: AuthUserDto, ipAddress: string) {
+  async authenticate(auth: AuthUserDto) {
     try {
       const user = await this.prisma.user.findUnique({
         where: {
@@ -29,14 +25,6 @@ export class AuthService {
       });
 
       if (!user) {
-        // Emitir evento de login falho com usuário inexistente
-        this.eventsService.emitLoginFailed({
-          description: `Tentativa de login falhou: usuário não encontrado`,
-          email: auth.email,
-          ipAddress,
-          reason: 'User not found',
-        });
-
         throw new BadRequestException('User not found');
       }
 
@@ -48,16 +36,6 @@ export class AuthService {
 
       if (!isPasswordValid) {
         // Emitir evento de login falho com senha incorreta
-        this.eventsService.emitLoginFailed({
-          description: `Tentativa de login falhou: credenciais inválidas`,
-          entityId: user.id,
-          entityType: 'User',
-          userId: user.id,
-          email: user.email,
-          ipAddress,
-          reason: 'Invalid password',
-        });
-
         throw new UnauthorizedException('Invalid credentials');
       }
 
@@ -65,17 +43,6 @@ export class AuthService {
       await this.prisma.user.update({
         where: { id: user.id },
         data: { lastAccess: new Date() },
-      });
-
-      // Emitir evento de login bem-sucedido
-      this.eventsService.emitLoginSuccess({
-        description: `Usuário ${user.name} realizou login com sucesso`,
-        entityId: user.id,
-        entityType: 'User',
-        userId: user.id,
-        email: user.email,
-        ipAddress,
-        role: user.role,
       });
 
       return this.signIn(user);
