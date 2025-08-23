@@ -1,20 +1,8 @@
-import {
-  IsAlphanumeric,
-  IsDateString,
-  IsEmail,
-  IsNotEmpty,
-  IsNumber,
-  IsNumberString,
-  IsPhoneNumber,
-  IsString,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
-  @IsNumberString()
-  cpf: string;
-
-  @IsNotEmpty()
+  @IsString()
   name: string;
 
   @IsNotEmpty()
@@ -22,43 +10,31 @@ export class CreateUserDto {
   email: string;
 
   @IsNotEmpty()
+  @IsString()
   password: string;
-
-  @IsDateString()
-  dtnasc: string;
-
-  @IsPhoneNumber('BR')
-  phone: string;
-
-  @IsString()
-  @IsNotEmpty()
-  cep: string;
-
-  @IsNotEmpty()
-  @IsString()
-  address: string;
-
-  @IsNotEmpty()
-  @IsString()
-  state: string;
-
-  @IsNotEmpty()
-  @IsString()
-  city: string;
-
 }
 
-export class AuthUserDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
+export class UpdateUserDto {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  password: string;
+  name?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
 }
 
 export class UpdateUserPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  currentPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
+
+export class AuthUserDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;

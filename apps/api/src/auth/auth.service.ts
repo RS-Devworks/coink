@@ -5,24 +5,20 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
-import { AuthUserDto } from 'src/user/dto/user.dto';
+import { UserService } from '../user/user.service';
+import { AuthUserDto } from '../user/dto/user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
   ) {}
 
   async authenticate(auth: AuthUserDto) {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          email: auth.email,
-        },
-      });
+      const user = await this.userService.findByEmail(auth.email);
 
       if (!user) {
         throw new BadRequestException('User not found');
@@ -40,10 +36,7 @@ export class AuthService {
       }
 
       // Atualizar último acesso do usuário
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { lastAccess: new Date() },
-      });
+      await this.userService.updateLastAccess(user.id);
 
       return this.signIn(user);
     } catch (error) {
@@ -71,11 +64,7 @@ export class AuthService {
   async getUserByToken(token: string) {
     try {
       const decodedToken = this.jwtService.verify(token);
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: decodedToken.id,
-        },
-      });
+      const user = await this.userService.findOne(decodedToken.id);
 
       if (!user) {
         throw new UnauthorizedException('User not found');
