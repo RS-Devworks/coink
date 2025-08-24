@@ -1,0 +1,120 @@
+### Fluxo completo de teste da API
+### Execute estes requests em sequência para testar todo o sistema
+
+### Variáveis de ambiente
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+###############################################
+### PASSO 1: Criar um novo usuário
+###############################################
+
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Usuário de Teste",
+  "email": "teste@coink.com",
+  "password": "senha123"
+}
+
+###############################################
+### PASSO 2: Fazer login com o usuário criado
+###############################################
+
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": "teste@coink.com",
+  "password": "senha123"
+}
+
+### IMPORTANTE: Copie o token retornado do login acima e cole na variável abaixo
+@token = COLE_SEU_TOKEN_AQUI
+
+###############################################
+### PASSO 3: Listar usuários (com autenticação)
+###############################################
+
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+###############################################
+### PASSO 4: Buscar usuário específico
+###############################################
+
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{token}}
+
+###############################################
+### PASSO 5: Atualizar dados do usuário
+###############################################
+
+PATCH {{baseUrl}}/users/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Nome Atualizado",
+  "email": "email.atualizado@coink.com"
+}
+
+###############################################
+### PASSO 6: Alterar senha do usuário
+###############################################
+
+PATCH {{baseUrl}}/users/1/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "currentPassword": "senha123",
+  "newPassword": "novaSenha456"
+}
+
+###############################################
+### PASSO 7: Testar login com nova senha
+###############################################
+
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": "email.atualizado@coink.com",
+  "password": "novaSenha456"
+}
+
+###############################################
+### PASSO 8 (OPCIONAL): Deletar usuário
+### ⚠️ CUIDADO: Isso remove permanentemente o usuário
+###############################################
+
+# DELETE {{baseUrl}}/users/1
+# Authorization: Bearer {{token}}
+
+###############################################
+### TESTES DE ERRO - Execute estes para testar validações
+###############################################
+
+### Teste 1: Login com credenciais inválidas
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": "usuario@inexistente.com",
+  "password": "senhaErrada"
+}
+
+### Teste 2: Acesso sem autenticação
+GET {{baseUrl}}/users
+
+### Teste 3: Criar usuário com dados inválidos
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "",
+  "email": "email-invalido",
+  "password": "123"
+}

@@ -1,0 +1,64 @@
+### Variáveis de ambiente
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmFmYWVsIERhbnRhcyIsImVtYWlsIjoicmFmYWVsQGV4YW1wbGUuY29tIiwiaWQiOiIzMzQxNzI3YS1iZTg2LTQwYzItODgyYy04OGI4NWY2ZmZkOGIiLCJpYXQiOjE3NTU5OTM2MTgsImV4cCI6MTc1NjA4MDAxOH0.6rmTFi_jGoJpT_4TiHbp25vwKm9JjphMlNuPfucXnlM
+
+### Login de usuário
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": "rafael@example.com",
+  "password": "senhaForte"
+}
+
+### Login com credenciais inválidas (teste de erro)
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": "invalid@example.com",
+  "password": "wrongpassword"
+}
+
+### Login sem email (teste de validação)
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "password": "password123"
+}
+
+### Login sem password (teste de validação)
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": "user@example.com"
+}
+
+### Login com dados completamente vazios (teste de validação)
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+}
+
+### Login com email inválido (teste de validação)
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": "email-invalido",
+  "password": "password123"
+}
+
+### Login com campos null (teste de validação)
+POST {{baseUrl}}/auth
+Content-Type: {{contentType}}
+
+{
+  "email": null,
+  "password": null
+}

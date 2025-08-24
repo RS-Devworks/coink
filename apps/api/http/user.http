@@ -1,0 +1,185 @@
+### Variáveis de ambiente
+@baseUrl = http://localhost:8888
+@contentType = application/json Variáveis de ambiente
+@baseUrl = http://localhost:5000
+@contentType = application/json
+@authToken = YOUR_AUTH_TOKEN_HERE
+
+### 1. Criar novo usuário
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Rafael Dantas",
+  "email": "rafael@example.com",
+  "password": "senhaForte"
+}
+
+### 2. Criar usuário com dados inválidos (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "",
+  "email": "teste@teste.com",
+  "password": ""
+}
+
+### 2.1. Criar usuário sem nome (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "email": "teste@teste.com",
+  "password": "senhaForte"
+}
+
+### 2.2. Criar usuário sem email (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste Nome",
+  "password": "senhaForte"
+}
+
+### 2.3. Criar usuário sem senha (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste Nome",
+  "email": "teste@teste.com"
+}
+
+### 2.4. Criar usuário com email inválido (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste Nome",
+  "email": "email-invalido",
+  "password": "senhaForte"
+}
+
+### 2.5. Criar usuário com senha muito curta (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste Nome",
+  "email": "teste@teste.com",
+  "password": "123"
+}
+
+### 2.6. Criar usuário com nome muito curto (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "A",
+  "email": "teste@teste.com",
+  "password": "senhaForte"
+}
+
+### 2.7. Criar usuário com dados vazios (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+}
+
+### 2.8. Criar usuário com campos null (teste de validação)
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": null,
+  "email": null,
+  "password": null
+}
+
+### 3. Listar todos os usuários (requer autenticação)
+GET {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+
+### 4. Buscar usuário por ID (requer autenticação)
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{authToken}}
+
+### 5. Buscar usuário com ID inválido (teste de erro)
+GET {{baseUrl}}/users/999
+Authorization: Bearer {{authToken}}
+
+### 6. Atualizar dados do usuário (requer autenticação)
+PATCH {{baseUrl}}/users/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "João Silva Santos",
+  "email": "joao.santos@example.com"
+}
+
+### 7. Atualizar apenas o nome (requer autenticação)
+PATCH {{baseUrl}}/users/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "João Pedro Silva"
+}
+
+### 8. Atualizar apenas o email (requer autenticação)
+PATCH {{baseUrl}}/users/1
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "email": "jp.silva@example.com"
+}
+
+### 9. Atualizar senha do usuário (requer autenticação)
+PATCH {{baseUrl}}/users/1/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "currentPassword": "password123",
+  "newPassword": "newPassword456"
+}
+
+### 10. Atualizar senha com senha atual incorreta (teste de erro)
+PATCH {{baseUrl}}/users/1/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "currentPassword": "senhaErrada",
+  "newPassword": "newPassword456"
+}
+
+### 11. Atualizar senha sem dados obrigatórios (teste de validação)
+PATCH {{baseUrl}}/users/1/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "currentPassword": "",
+  "newPassword": ""
+}
+
+### 12. Deletar usuário (requer autenticação)
+DELETE {{baseUrl}}/users/1
+Authorization: Bearer {{authToken}}
+
+### 13. Tentar deletar usuário inexistente (teste de erro)
+DELETE {{baseUrl}}/users/999
+Authorization: Bearer {{authToken}}
+
+### 14. Teste sem autenticação (deve retornar 401)
+GET {{baseUrl}}/users
+
+### 15. Teste com token inválido (deve retornar 401)
+GET {{baseUrl}}/users
+Authorization: Bearer token_invalido
