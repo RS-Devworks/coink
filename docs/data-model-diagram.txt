@@ -1,0 +1,103 @@
+direction down
+title Coink - Financial Management Data Model
+
+// User Entity
+User [icon: user] {
+  id: String [pk]
+  email: String [unique]
+  name: String
+  password: String [encrypted]
+  lastAccess: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+// Category Entity
+Category [icon: tag] {
+  id: String [pk]
+  name: String
+  description: String?
+  color: String? [hex]
+  icon: String?
+  type: TransactionType [enum]
+  isDefault: Boolean
+  userId: String [fk]
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+// Transaction Entity
+Transaction [icon: dollar] {
+  id: String [pk]
+  description: String
+  amount: Float [currency]
+  type: TransactionType [enum]
+  paymentMethod: PaymentMethod [enum]
+  date: DateTime
+  dueDate: DateTime?
+  isPaid: Boolean
+  isRecurring: Boolean
+  recurringDay: Int?
+  
+  // Installment fields
+  isInstallment: Boolean
+  installmentNum: Int?
+  totalInstallments: Int?
+  installmentGroupId: String?
+  
+  // Financial calculations
+  interestRate: Float? [percentage]
+  taxRate: Float? [percentage]
+  originalAmount: Float?
+  
+  // Relations
+  userId: String [fk]
+  categoryId: String [fk]
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+// Enums
+TransactionType [icon: list] {
+  INCOME
+  EXPENSE
+}
+
+PaymentMethod [icon: credit-card] {
+  CASH
+  DEBIT_CARD
+  CREDIT_CARD
+  PIX
+  BANK_TRANSFER
+  CHECK
+  LOAN
+}
+
+// Relationships
+User ||--o{ Category: "owns categories"
+User ||--o{ Transaction: "has transactions"
+Category ||--o{ Transaction: "categorizes"
+
+// Installment Grouping
+Transaction ||--o{ Transaction: "installment group"
+
+// Business Rules
+Rules [icon: rules, label: "Business Rules"] {
+  Auth [label: "• JWT Authentication Required"]
+  Isolation [label: "• Data isolated by User"]
+  Categories [label: "• Default categories provided"]
+  Validation [label: "• Input validation with DTOs"]
+  Installments [label: "• Auto-generate installments"]
+  Interest [label: "• Calculate compound interest"]
+  Unique [label: "• Category names unique per user/type"]
+}
+
+// Key Features
+Features [icon: features, label: "Key Features"] {
+  Dashboard [label: "• Monthly income/expense reports"]
+  Categorization [label: "• Smart expense categorization"]
+  Installments [label: "• Multi-installment purchases"]
+  Recurring [label: "• Recurring transactions"]
+  Calculations [label: "• Interest & tax calculations"]
+  Filtering [label: "• Advanced filtering options"]
+}

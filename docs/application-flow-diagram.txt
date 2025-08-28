@@ -1,0 +1,102 @@
+direction right
+title Coink - Application Flow & User Journey
+
+// User Authentication Flow
+Start [icon: play, label: "User Starts"]
+Register [icon: user-plus, label: "Register Account"]
+Login [icon: key, label: "Login"]
+JWT [icon: token, label: "JWT Token"]
+
+Start > Register: New user
+Start > Login: Existing user
+Register > Login: Account created
+Login > JWT: Valid credentials
+
+// Main Application Flow
+Dashboard [icon: dashboard, label: "Financial Dashboard"] {
+  Summary [label: "Monthly Summary"]
+  Charts [icon: chart, label: "Income/Expense Charts"]
+  Recent [label: "Recent Transactions"]
+}
+
+Categories [icon: tag, label: "Category Management"] {
+  DefaultSetup [label: "Setup Default Categories"]
+  CustomCategories [label: "Create Custom Categories"]
+  ManageCategories [label: "Edit/Delete Categories"]
+}
+
+Transactions [icon: dollar, label: "Transaction Management"] {
+  AddSingle [label: "Add Single Transaction"]
+  AddInstallment [label: "Add Installment Purchase"]
+  AddRecurring [label: "Add Recurring Transaction"]
+  ViewTransactions [label: "View Transaction List"]
+  EditTransaction [label: "Edit Transaction"]
+  PayInstallment [label: "Mark Installment as Paid"]
+}
+
+// Authentication Required
+JWT > Dashboard: Authenticated access
+JWT > Categories: Manage categories
+JWT > Transactions: Financial operations
+
+// Category Setup Flow
+Categories > DefaultSetup: First time setup
+DefaultSetup > CustomCategories: Add personal categories
+CustomCategories > Transactions: Ready to track finances
+
+// Transaction Creation Flow
+TransactionFlow [label: "Transaction Creation"] {
+  SelectType [icon: choice, label: "Select Type (Income/Expense)"]
+  SelectCategory [label: "Choose Category"]
+  EnterAmount [icon: calculator, label: "Enter Amount"]
+  SelectPayment [icon: credit-card, label: "Payment Method"]
+  AdvancedOptions [label: "Advanced Options"]
+}
+
+Transactions > TransactionFlow: Create new transaction
+SelectType > SelectCategory: Define transaction
+SelectCategory > EnterAmount: Categorize expense/income
+EnterAmount > SelectPayment: Set amount
+SelectPayment > AdvancedOptions: Choose payment method
+
+// Advanced Transaction Options
+AdvancedOptions > InstallmentOptions: Installment purchase
+AdvancedOptions > RecurringOptions: Recurring transaction
+AdvancedOptions > InterestOptions: Interest/tax calculation
+
+InstallmentOptions [label: "Installment Options"] {
+  Installments [label: "Number of Installments"]
+  InterestRate [label: "Interest Rate %"]
+  FirstPayment [label: "First Payment Date"]
+}
+
+RecurringOptions [label: "Recurring Options"] {
+  Frequency [label: "Monthly Recurrence"]
+  RecurringDay [label: "Day of Month"]
+}
+
+InterestOptions [label: "Interest/Tax Options"] {
+  Interest [label: "Interest Rate %"]
+  Tax [label: "Tax Rate %"]
+  OriginalAmount [label: "Original Amount"]
+}
+
+// Reporting & Analytics Flow
+Reports [icon: chart-bar, label: "Financial Reports"] {
+  Monthly [label: "Monthly Summary"]
+  CategoryAnalysis [label: "Category Analysis"]
+  PaymentMethods [label: "Payment Method Analysis"]
+  InstallmentTracking [label: "Installment Tracking"]
+}
+
+Dashboard > Reports: View detailed reports
+Transactions > Reports: Analyze spending patterns
+
+// Data Persistence Flow
+Database [icon: database, label: "SQLite Database"]
+Prisma [icon: prisma, label: "Prisma ORM"]
+
+Transactions > Prisma: Save transaction data
+Categories > Prisma: Save category data
+Prisma > Database: Persist to SQLite
+Database > Reports: Generate analytics
