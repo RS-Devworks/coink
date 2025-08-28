@@ -21,4 +21,79 @@ model User {
   lastAccess DateTime @default(now())
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  // Financial relations
+  categories   Category[]
+  transactions Transaction[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  color       String?  // Hex color for UI
+  icon        String?  // Icon identifier for UI
+  type        TransactionType // INCOME or EXPENSE
+  isDefault   Boolean  @default(false) // System default categories
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([name, userId, type]) // User can't have duplicate category names per type
+}
+
+model Transaction {
+  id              String          @id @default(uuid())
+  description     String
+  amount          Float
+  type            TransactionType
+  paymentMethod   PaymentMethod
+  date            DateTime        @default(now())
+  dueDate         DateTime?       // For credit card or future payments
+  isPaid          Boolean         @default(true)
+  isRecurring     Boolean         @default(false)
+  recurringDay    Int?            // Day of month for recurring transactions
+  
+  // Installment info
+  isInstallment   Boolean         @default(false)
+  installmentNum  Int?            // Current installment (e.g., 1 of 12)
+  totalInstallments Int?          // Total number of installments
+  installmentGroupId String?      // Groups related installments
+  
+  // Interest and tax calculations
+  interestRate    Float?          // Percentage
+  taxRate         Float?          // Percentage
+  originalAmount  Float?          // Amount before interest/tax
+  
+  // Relations
+  userId     String
+  categoryId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([installmentGroupId])
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum PaymentMethod {
+  CASH
+  DEBIT_CARD
+  CREDIT_CARD
+  PIX
+  BANK_TRANSFER
+  CHECK
+  LOAN
 }

@@ -1,0 +1,208 @@
+### Variables
+@baseUrl = http://localhost:3000
+@token = {{auth_login.response.body.accessToken}}
+
+### Create Simple Income Transaction
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Pagamento freelance projeto ABC",
+  "amount": 2500.00,
+  "type": "INCOME",
+  "paymentMethod": "PIX",
+  "categoryId": "{{income_category_id}}",
+  "date": "2024-01-15T00:00:00.000Z"
+}
+
+### Create Simple Expense Transaction
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Compra supermercado",
+  "amount": 250.75,
+  "type": "EXPENSE",
+  "paymentMethod": "DEBIT_CARD",
+  "categoryId": "{{expense_category_id}}",
+  "isPaid": true
+}
+
+### Create Credit Card Expense (Future Due Date)
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Compra online - roupas",
+  "amount": 350.00,
+  "type": "EXPENSE",
+  "paymentMethod": "CREDIT_CARD",
+  "categoryId": "{{expense_category_id}}",
+  "isPaid": false,
+  "dueDate": "2024-02-10T00:00:00.000Z"
+}
+
+### Create Transaction with Interest and Tax
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Empréstimo pessoal",
+  "amount": 1000.00,
+  "type": "EXPENSE",
+  "paymentMethod": "LOAN",
+  "categoryId": "{{expense_category_id}}",
+  "interestRate": 15.5,
+  "taxRate": 2.0,
+  "originalAmount": 1000.00
+}
+
+### Create Recurring Transaction
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Salário mensal",
+  "amount": 5000.00,
+  "type": "INCOME",
+  "paymentMethod": "BANK_TRANSFER",
+  "categoryId": "{{income_category_id}}",
+  "isRecurring": true,
+  "recurringDay": 5
+}
+
+### Create Installment Transaction (Smartphone)
+POST {{baseUrl}}/transactions/installments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "iPhone 15 Pro",
+  "amount": 7200.00,
+  "type": "EXPENSE",
+  "paymentMethod": "CREDIT_CARD",
+  "categoryId": "{{expense_category_id}}",
+  "isInstallment": true,
+  "totalInstallments": 12,
+  "interestRate": 2.5
+}
+
+### Create Installment Transaction with Down Payment
+POST {{baseUrl}}/transactions/installments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Notebook Dell",
+  "amount": 3600.00,
+  "type": "EXPENSE",
+  "paymentMethod": "CREDIT_CARD",
+  "categoryId": "{{expense_category_id}}",
+  "isInstallment": true,
+  "totalInstallments": 6,
+  "downPayment": 600.00
+}
+
+### Get All Transactions (with pagination)
+GET {{baseUrl}}/transactions?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Get Transactions by Type (Expenses only)
+GET {{baseUrl}}/transactions?type=EXPENSE&page=1&limit=20
+Authorization: Bearer {{token}}
+
+### Get Transactions by Payment Method
+GET {{baseUrl}}/transactions?paymentMethod=CREDIT_CARD
+Authorization: Bearer {{token}}
+
+### Get Transactions by Date Range
+GET {{baseUrl}}/transactions?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+### Get Installment Transactions Only
+GET {{baseUrl}}/transactions?isInstallment=true
+Authorization: Bearer {{token}}
+
+### Get Unpaid Transactions
+GET {{baseUrl}}/transactions?isPaid=false
+Authorization: Bearer {{token}}
+
+### Get Specific Transaction
+GET {{baseUrl}}/transactions/{{transaction_id}}
+Authorization: Bearer {{token}}
+
+### Get Installment Group
+GET {{baseUrl}}/transactions/installments/{{installment_group_id}}
+Authorization: Bearer {{token}}
+
+### Get Monthly Summary (January 2024)
+GET {{baseUrl}}/transactions/summary/2024/1
+Authorization: Bearer {{token}}
+
+### Update Transaction
+PATCH {{baseUrl}}/transactions/{{transaction_id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Updated transaction description",
+  "amount": 300.00,
+  "isPaid": true
+}
+
+### Mark Installment as Paid
+PATCH {{baseUrl}}/transactions/{{installment_transaction_id}}/payment-status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "isPaid": true
+}
+
+### Mark Installment as Unpaid
+PATCH {{baseUrl}}/transactions/{{installment_transaction_id}}/payment-status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "isPaid": false
+}
+
+### Delete Single Transaction
+DELETE {{baseUrl}}/transactions/{{transaction_id}}
+Authorization: Bearer {{token}}
+
+### Delete Entire Installment Group
+DELETE {{baseUrl}}/transactions/installments/{{installment_group_id}}
+Authorization: Bearer {{token}}
+
+### Try to Create Transaction with Invalid Category (Should Fail)
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Invalid category test",
+  "amount": 100.00,
+  "type": "EXPENSE",
+  "paymentMethod": "CASH",
+  "categoryId": "invalid-category-id"
+}
+
+### Try to Create Transaction with Invalid Amount (Should Fail)
+POST {{baseUrl}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Invalid amount test",
+  "amount": -100.00,
+  "type": "EXPENSE",
+  "paymentMethod": "CASH",
+  "categoryId": "{{expense_category_id}}"
+}

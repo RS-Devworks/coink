@@ -1,0 +1,88 @@
+### Variables
+@baseUrl = http://localhost:3000
+@token = {{auth_login.response.body.accessToken}}
+
+### Create Income Category
+POST {{baseUrl}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Freelance Web Design",
+  "description": "Income from freelance web design projects",
+  "color": "#4CAF50",
+  "icon": "computer",
+  "type": "INCOME"
+}
+
+### Create Expense Category
+POST {{baseUrl}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Supermercado",
+  "description": "Compras no supermercado",
+  "color": "#F44336",
+  "icon": "shopping-cart",
+  "type": "EXPENSE"
+}
+
+### Get All Categories
+GET {{baseUrl}}/categories
+Authorization: Bearer {{token}}
+
+### Get Categories by Type (Income)
+GET {{baseUrl}}/categories?type=INCOME
+Authorization: Bearer {{token}}
+
+### Get Categories by Type (Expense)
+GET {{baseUrl}}/categories?type=EXPENSE
+Authorization: Bearer {{token}}
+
+### Get Specific Category
+GET {{baseUrl}}/categories/{{category_id}}
+Authorization: Bearer {{token}}
+
+### Update Category
+PATCH {{baseUrl}}/categories/{{category_id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Freelance Updated",
+  "description": "Updated description",
+  "color": "#2196F3"
+}
+
+### Setup Default Categories
+POST {{baseUrl}}/categories/setup-defaults
+Authorization: Bearer {{token}}
+
+### Delete Category
+DELETE {{baseUrl}}/categories/{{category_id}}
+Authorization: Bearer {{token}}
+
+### Try to Create Duplicate Category (Should Fail)
+POST {{baseUrl}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Freelance Web Design",
+  "description": "Duplicate name test",
+  "color": "#4CAF50",
+  "icon": "computer",
+  "type": "INCOME"
+}
+
+### Try to Create Category with Invalid Color (Should Fail)
+POST {{baseUrl}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Invalid Color Category",
+  "color": "invalid-color",
+  "type": "INCOME"
+}
