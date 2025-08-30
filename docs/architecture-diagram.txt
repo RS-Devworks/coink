@@ -2,60 +2,61 @@ direction right
 title Coink - Financial Management System Architecture
 
 // Client Layer
-Web Browser [icon: chrome, label: "Web Browser"]
+Browser [icon: chrome, label: "Web Browser"]
 
-// Frontend Layer
-Frontend [icon: nextdotjs, label: "Next.js 15"] {
-  Pages [label: "Pages Router"]
-  Components [label: "React Components"]
-  Styles [icon: tailwindcss, label: "TailwindCSS"]
-}
-
-// Backend Layer - Turborepo Monorepo
-Monorepo [icon: turborepo, label: "Turborepo Monorepo"] {
+// Monorepo Structure
+Monorepo [label: "Turborepo Monorepo"] {
+  // Frontend Application
+  WebApp [icon: nextdotjs, label: "Next.js 15"] {
+    Pages [label: "Pages Router"]
+    Components [label: "React Components"] 
+    Styles [icon: tailwindcss, label: "TailwindCSS"]
+  }
+  
+  // Backend API
   API [icon: nestjs, label: "NestJS API"] {
     Controllers [label: "Controllers Layer"]
     Services [label: "Business Logic"]
     Guards [icon: shield, label: "JWT Auth Guards"]
     DTOs [label: "Validation DTOs"]
   }
-  
-  Web [icon: nextdotjs, label: "Web App"]
 }
 
 // Database Layer
-Database [icon: sqlite, label: "SQLite Database"] {
-  Users [label: "Users Table"]
-  Categories [label: "Categories Table"]
-  Transactions [label: "Transactions Table"]
+DatabaseLayer [label: "Data Layer"] {
+  ORM [icon: prisma, label: "Prisma ORM"]
+  Database [icon: sqlite, label: "SQLite Database"] {
+    Users [label: "Users Table"]
+    Categories [label: "Categories Table"] 
+    Transactions [label: "Transactions Table"]
+  }
 }
 
-// ORM Layer
-Prisma [icon: prisma, label: "Prisma ORM"]
-
-// External Tools
-Tools [label: "Development Tools"] {
-  VSCode [icon: vscode, label: "VS Code + HTTP Files"]
+// Development Tools
+DevTools [label: "Development Tools"] {
+  VSCode [icon: vscode, label: "VS Code"]
+  HTTPFiles [label: "HTTP Test Files"]
   Testing [icon: jest, label: "Jest E2E Tests"]
 }
 
-// Connections
-Web Browser > Frontend: HTTP/HTTPS requests
-Frontend > API: REST API calls
-API > Prisma: Database operations
-Prisma > Database: SQL queries
-API > Guards: Authentication
-Controllers > Services: Business logic
-Services > DTOs: Data validation
-Tools > API: Testing & Development
-
-// Authentication Flow
-Auth Flow [label: "Authentication Flow"] {
+// Authentication System
+AuthSystem [label: "Authentication System"] {
   Login [icon: key, label: "JWT Login"]
-  Token [icon: token, label: "Bearer Token"]
+  Token [icon: shield, label: "Bearer Token"]
   Protected [icon: lock, label: "Protected Routes"]
 }
 
+// Connections
+Browser > WebApp: HTTPS requests
+WebApp > API: REST API calls
+API > ORM: Database operations
+ORM > Database: SQL queries
+API > Guards: Authentication check
+Controllers > Services: Business logic
+Services > DTOs: Data validation
+DevTools > API: Testing & Development
+
+// Authentication Flow
 Login > Token: Generate JWT
 Token > Protected: Authorize requests
 Protected > API: Secured access

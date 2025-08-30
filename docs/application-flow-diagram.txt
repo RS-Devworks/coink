@@ -1,102 +1,106 @@
 direction right
 title Coink - Application Flow & User Journey
 
-// User Authentication Flow
-Start [icon: play, label: "User Starts"]
+// Entry Points
+Start [icon: user, label: "User Starts"]
 Register [icon: user-plus, label: "Register Account"]
 Login [icon: key, label: "Login"]
-JWT [icon: token, label: "JWT Token"]
 
+// Authentication Flow
+AuthFlow [label: "Authentication"] {
+  JWT [icon: shield, label: "JWT Token"]
+  Validation [icon: check, label: "Token Validation"]
+}
+
+// Main Dashboard
+Dashboard [icon: dashboard, label: "Financial Dashboard"] {
+  MonthlySummary [label: "Monthly Summary"]
+  IncomeExpenseCharts [icon: chart, label: "Charts"]
+  RecentTransactions [label: "Recent Transactions"]
+  CategoryBreakdown [label: "Category Breakdown"]
+}
+
+// Category Management
+CategoryMgmt [icon: tag, label: "Category Management"] {
+  SetupDefaults [label: "Setup Default Categories"]
+  CreateCustom [label: "Create Custom Categories"]
+  ManageExisting [label: "Edit/Delete Categories"]
+  CategoryFilters [label: "Filter by Type"]
+}
+
+// Transaction Management
+TransactionMgmt [icon: dollar, label: "Transaction Management"] {
+  CreateSingle [label: "Add Single Transaction"]
+  CreateInstallment [label: "Add Installment Purchase"]
+  CreateRecurring [label: "Add Recurring Transaction"]
+  ViewList [label: "View Transaction List"]
+  EditTransaction [label: "Edit Transaction"]
+  PayInstallment [label: "Mark Installment as Paid"]
+  FilterTransactions [label: "Advanced Filtering"]
+}
+
+// Advanced Transaction Options
+AdvancedOptions [label: "Advanced Options"] {
+  InstallmentConfig [label: "Installment Configuration"] {
+    NumInstallments [label: "Number of Installments"]
+    InterestRate [label: "Interest Rate %"]
+    FirstPaymentDate [label: "First Payment Date"]
+  }
+  
+  RecurringConfig [label: "Recurring Configuration"] {
+    Frequency [label: "Monthly Frequency"]
+    RecurringDay [label: "Day of Month"]
+  }
+  
+  FinancialCalc [label: "Financial Calculations"] {
+    Interest [label: "Interest Rate %"]
+    Tax [label: "Tax Rate %"]
+    OriginalAmount [label: "Original Amount"]
+  }
+}
+
+// Reporting System
+ReportingSystem [icon: chart, label: "Financial Reports"] {
+  MonthlyReports [label: "Monthly Summary"]
+  CategoryAnalysis [label: "Category Analysis"]
+  PaymentMethodAnalysis [label: "Payment Method Analysis"]
+  InstallmentTracking [label: "Installment Tracking"]
+  ExportData [label: "Export Data"]
+}
+
+// Data Layer
+DataLayer [label: "Data Persistence"] {
+  PrismaORM [icon: prisma, label: "Prisma ORM"]
+  SQLiteDB [icon: sqlite, label: "SQLite Database"]
+}
+
+// Flow Connections
 Start > Register: New user
 Start > Login: Existing user
 Register > Login: Account created
 Login > JWT: Valid credentials
-
-// Main Application Flow
-Dashboard [icon: dashboard, label: "Financial Dashboard"] {
-  Summary [label: "Monthly Summary"]
-  Charts [icon: chart, label: "Income/Expense Charts"]
-  Recent [label: "Recent Transactions"]
-}
-
-Categories [icon: tag, label: "Category Management"] {
-  DefaultSetup [label: "Setup Default Categories"]
-  CustomCategories [label: "Create Custom Categories"]
-  ManageCategories [label: "Edit/Delete Categories"]
-}
-
-Transactions [icon: dollar, label: "Transaction Management"] {
-  AddSingle [label: "Add Single Transaction"]
-  AddInstallment [label: "Add Installment Purchase"]
-  AddRecurring [label: "Add Recurring Transaction"]
-  ViewTransactions [label: "View Transaction List"]
-  EditTransaction [label: "Edit Transaction"]
-  PayInstallment [label: "Mark Installment as Paid"]
-}
-
-// Authentication Required
 JWT > Dashboard: Authenticated access
-JWT > Categories: Manage categories
-JWT > Transactions: Financial operations
 
-// Category Setup Flow
-Categories > DefaultSetup: First time setup
-DefaultSetup > CustomCategories: Add personal categories
-CustomCategories > Transactions: Ready to track finances
+// Main navigation
+Dashboard > CategoryMgmt: Manage categories
+Dashboard > TransactionMgmt: Manage transactions
+Dashboard > ReportingSystem: View reports
 
-// Transaction Creation Flow
-TransactionFlow [label: "Transaction Creation"] {
-  SelectType [icon: choice, label: "Select Type (Income/Expense)"]
-  SelectCategory [label: "Choose Category"]
-  EnterAmount [icon: calculator, label: "Enter Amount"]
-  SelectPayment [icon: credit-card, label: "Payment Method"]
-  AdvancedOptions [label: "Advanced Options"]
-}
+// Category flow
+CategoryMgmt > SetupDefaults: First time setup
+SetupDefaults > CreateCustom: Add personal categories
+CreateCustom > TransactionMgmt: Ready to track
 
-Transactions > TransactionFlow: Create new transaction
-SelectType > SelectCategory: Define transaction
-SelectCategory > EnterAmount: Categorize expense/income
-EnterAmount > SelectPayment: Set amount
-SelectPayment > AdvancedOptions: Choose payment method
+// Transaction creation flow
+TransactionMgmt > CreateSingle: Simple transaction
+TransactionMgmt > CreateInstallment: Installment purchase
+TransactionMgmt > CreateRecurring: Recurring transaction
+CreateInstallment > AdvancedOptions: Configure installment
+CreateRecurring > AdvancedOptions: Configure recurrence
+AdvancedOptions > DataLayer: Save transaction
 
-// Advanced Transaction Options
-AdvancedOptions > InstallmentOptions: Installment purchase
-AdvancedOptions > RecurringOptions: Recurring transaction
-AdvancedOptions > InterestOptions: Interest/tax calculation
-
-InstallmentOptions [label: "Installment Options"] {
-  Installments [label: "Number of Installments"]
-  InterestRate [label: "Interest Rate %"]
-  FirstPayment [label: "First Payment Date"]
-}
-
-RecurringOptions [label: "Recurring Options"] {
-  Frequency [label: "Monthly Recurrence"]
-  RecurringDay [label: "Day of Month"]
-}
-
-InterestOptions [label: "Interest/Tax Options"] {
-  Interest [label: "Interest Rate %"]
-  Tax [label: "Tax Rate %"]
-  OriginalAmount [label: "Original Amount"]
-}
-
-// Reporting & Analytics Flow
-Reports [icon: chart-bar, label: "Financial Reports"] {
-  Monthly [label: "Monthly Summary"]
-  CategoryAnalysis [label: "Category Analysis"]
-  PaymentMethods [label: "Payment Method Analysis"]
-  InstallmentTracking [label: "Installment Tracking"]
-}
-
-Dashboard > Reports: View detailed reports
-Transactions > Reports: Analyze spending patterns
-
-// Data Persistence Flow
-Database [icon: database, label: "SQLite Database"]
-Prisma [icon: prisma, label: "Prisma ORM"]
-
-Transactions > Prisma: Save transaction data
-Categories > Prisma: Save category data
-Prisma > Database: Persist to SQLite
-Database > Reports: Generate analytics
+// Data flow
+TransactionMgmt > PrismaORM: Save data
+CategoryMgmt > PrismaORM: Save categories
+PrismaORM > SQLiteDB: Persist data
+SQLiteDB > ReportingSystem: Generate reports

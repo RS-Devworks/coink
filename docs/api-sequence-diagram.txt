@@ -1,0 +1,97 @@
+title Coink API - User Authentication & Transaction Creation Flow
+
+// Authentication Flow
+User [icon: user] > Frontend [icon: nextdotjs]: Enter credentials
+Frontend > API [icon: nestjs]: POST /auth/login
+API > AuthService [icon: shield]: authenticate(email, password)
+AuthService > UserService [icon: user]: findByEmail(email)
+UserService > Database [icon: sqlite]: SELECT user WHERE email
+Database > UserService: User data
+UserService > AuthService: User found
+
+alt Valid password
+  AuthService > JWT [icon: key]: generateToken(user)
+  JWT > AuthService: Access token
+  AuthService > UserService: updateLastAccess(userId)
+  UserService > Database: UPDATE lastAccess
+  AuthService > API: { accessToken, user }
+  API > Frontend: 201 Success + token
+  Frontend > User: Login successful
+else Invalid password  
+  AuthService > API: UnauthorizedException
+  API > Frontend: 401 Unauthorized
+  Frontend > User: Show error message
+end
+
+// Category Setup Flow
+User > Frontend: Setup categories
+Frontend > API: POST /categories/setup-defaults
+API > AuthGuard [icon: shield]: validateToken(bearerToken)
+AuthGuard > JWT: verify(token)
+JWT > AuthGuard: User payload
+AuthGuard > API: User context
+API > CategoryService [icon: tag]: createDefaultCategories(userId)
+
+loop For each default category
+  CategoryService > Database: INSERT category
+end
+
+CategoryService > API: Categories created
+API > Frontend: 201 Success
+Frontend > User: Categories ready
+
+// Transaction Creation Flow
+User > Frontend: Create transaction
+Frontend > API: POST /transactions
+API > AuthGuard: validateToken(bearerToken)
+AuthGuard > API: User context
+API > TransactionController [icon: dollar]: create(createTransactionDto)
+TransactionController > TransactionService: create(userId, dto)
+TransactionService > CategoryService: validateCategoryOwnership(userId, categoryId)
+CategoryService > Database: SELECT category WHERE id AND userId
+Database > CategoryService: Category found
+CategoryService > TransactionService: Category valid
+
+opt Interest or tax calculation
+  TransactionService > TransactionService: calculateAmounts(amount, interest, tax)
+end
+
+TransactionService > Database: INSERT transaction
+Database > TransactionService: Transaction created
+TransactionService > TransactionController: Transaction with category
+TransactionController > API: Created transaction
+API > Frontend: 201 Success + transaction data
+Frontend > User: Transaction saved
+
+// Installment Transaction Flow  
+User > Frontend: Create installment purchase
+Frontend > API: POST /transactions/installments
+API > AuthGuard: validateToken(bearerToken)
+API > TransactionController: createInstallments(createInstallmentDto)
+TransactionController > TransactionService: createInstallmentTransactions(userId, dto)
+TransactionService > UUID [icon: key]: generateInstallmentGroupId()
+UUID > TransactionService: Group ID
+
+loop For each installment (1 to totalInstallments)
+  TransactionService > TransactionService: calculateInstallmentAmount()
+  TransactionService > Database: INSERT installment transaction
+end
+
+TransactionService > TransactionController: { groupId, transactions, summary }
+TransactionController > API: Installments created
+API > Frontend: 201 Success + installment group
+Frontend > User: Installments scheduled
+
+// Monthly Report Generation
+User > Frontend: View monthly report
+Frontend > API: GET /transactions/summary/2024/1
+API > AuthGuard: validateToken(bearerToken)
+API > TransactionController: getMonthlySum(userId, 2024, 1)
+TransactionController > TransactionService: getMonthlySum(userId, year, month)
+TransactionService > Database: SELECT SUM(amount) GROUP BY type WHERE date BETWEEN
+Database > TransactionService: Income and expense totals
+TransactionService > TransactionService: calculateBalance(income - expense)
+TransactionService > TransactionController: { income, expense, balance }
+TransactionController > API: Monthly summary
+API > Frontend: 200 Success + summary data
+Frontend > User: Display charts and totals
