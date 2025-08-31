@@ -153,7 +153,7 @@ export default function TransactionsTable() {
             <CardTitle className="text-sm font-medium">Total de Receitas</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-income">
               +R$ {totalIncome.toFixed(2).replace('.', ',')}
             </div>
           </CardContent>
@@ -164,7 +164,7 @@ export default function TransactionsTable() {
             <CardTitle className="text-sm font-medium">Total de Despesas</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-expense">
               -R$ {totalExpenses.toFixed(2).replace('.', ',')}
             </div>
           </CardContent>
@@ -175,7 +175,7 @@ export default function TransactionsTable() {
             <CardTitle className="text-sm font-medium">Saldo Líquido</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${totalBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`text-2xl font-bold ${totalBalance >= 0 ? 'text-income' : 'text-expense'}`}>
               {totalBalance >= 0 ? '+' : ''}R$ {totalBalance.toFixed(2).replace('.', ',')}
             </div>
           </CardContent>
@@ -267,7 +267,7 @@ export default function TransactionsTable() {
                     </TableCell>
                     <TableCell className="text-right">
                       <span className={`font-medium ${
-                        transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+                        transaction.type === 'INCOME' ? 'text-income' : 'text-expense'
                       }`}>
                         {transaction.type === 'INCOME' ? '+' : '-'}R$ {transaction.amount.toFixed(2).replace('.', ',')}
                       </span>

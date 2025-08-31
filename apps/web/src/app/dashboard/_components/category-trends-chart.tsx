@@ -33,7 +33,7 @@ interface TooltipProps {
 const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border rounded-lg shadow-lg">
+      <div className="bg-card p-3 border rounded-lg shadow-lg">
         <p className="font-medium mb-2">{label}</p>
         {payload
           .filter((p) => p.value > 0)
@@ -45,7 +45,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
                 style={{ backgroundColor: entry.color }}
               />
               <span className="font-medium">{entry.dataKey}:</span>
-              <span className="ml-2 text-red-600">{formatCurrency(entry.value)}</span>
+              <span className="ml-2 text-expense font-semibold">{formatCurrency(entry.value)}</span>
             </p>
           ))}
       </div>
@@ -130,13 +130,16 @@ export default function CategoryTrendsChart({ data }: CategoryTrendsChartProps) 
           <h4 className="font-semibold mb-3 text-sm">Resumo das Tendências:</h4>
           <div className="grid gap-2">
             {data.categories.map((category) => {
-              const categoryData = data.chartData.map(month => month[category.name] || 0)
-              const firstValue = categoryData.find(v => v > 0) || 0
-              const lastValue = categoryData[categoryData.length - 1] || 0
-              const trend = lastValue > firstValue ? 'increase' : lastValue < firstValue ? 'decrease' : 'stable'
-              const change = lastValue - firstValue
+              const categoryData = data.chartData.map(month => {
+                const value = month[category.name];
+                return typeof value === 'number' ? value : 0;
+              });
+              const firstValue: number = categoryData.find(v => v > 0) || 0;
+              const lastValue: number = categoryData[categoryData.length - 1] || 0;
+              const trend = lastValue > firstValue ? 'increase' : lastValue < firstValue ? 'decrease' : 'stable';
+              const change = lastValue - firstValue;
               
-              if (lastValue === 0 && firstValue === 0) return null
+              if (lastValue === 0 && firstValue === 0) return null;
               
               return (
                 <div key={category.id} className="flex items-center justify-between text-sm">
@@ -149,8 +152,8 @@ export default function CategoryTrendsChart({ data }: CategoryTrendsChartProps) 
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={
-                      trend === 'increase' ? 'text-red-600' :
-                      trend === 'decrease' ? 'text-green-600' :
+                      trend === 'increase' ? 'text-expense' :
+                      trend === 'decrease' ? 'text-income' :
                       'text-muted-foreground'
                     }>
                       {trend === 'increase' && '↗'}

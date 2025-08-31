@@ -1,61 +1,76 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis, Legend } from "recharts"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+} from "@/components/ui/chart";
+import { Line, LineChart, XAxis, YAxis, Legend } from "recharts";
 
 interface IncomeTrendsData {
-  chartData: Record<string, number | string>[]
-  categories: { id: string; name: string; color: string }[]
+  chartData: Record<string, number | string>[];
+  categories: { id: string; name: string; color: string }[];
 }
 
 interface IncomeTrendsChartProps {
-  data: IncomeTrendsData
-  title?: string
+  data: IncomeTrendsData;
+  title?: string;
 }
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(value)
-}
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+};
 
 interface TooltipProps {
-  active?: boolean
+  active?: boolean;
   payload?: Array<{
-    value: number
-    dataKey: string
-    color: string
-  }>
-  label?: string
+    value: number;
+    dataKey: string;
+    color: string;
+  }>;
+  label?: string;
 }
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border rounded-lg shadow-lg">
+      <div className="bg-card p-3 border rounded-lg shadow-lg">
         <p className="font-medium mb-2">{label}</p>
         {payload
           .filter((p) => p.value > 0)
           .sort((a, b) => b.value - a.value)
           .map((entry, index: number) => (
             <p key={index} className="text-sm">
-              <span 
-                className="inline-block w-3 h-3 rounded-full mr-2" 
+              <span
+                className="inline-block w-3 h-3 rounded-full mr-2"
                 style={{ backgroundColor: entry.color }}
               />
               <span className="font-medium">{entry.dataKey}:</span>
-              <span className="ml-2 text-green-600">{formatCurrency(entry.value)}</span>
+              <span className="ml-2 text-income font-semibold">
+                {formatCurrency(entry.value)}
+              </span>
             </p>
           ))}
       </div>
-    )
+    );
   }
-  return null
-}
+  return null;
+};
 
-export default function IncomeTrendsChart({ data, title = "Tendências de Receitas por Categoria" }: IncomeTrendsChartProps) {
+export default function IncomeTrendsChart({
+  data,
+  title = "Tendências de Receitas por Categoria",
+}: IncomeTrendsChartProps) {
   if (!data.chartData.length || !data.categories.length) {
     return (
       <Card>
@@ -72,17 +87,17 @@ export default function IncomeTrendsChart({ data, title = "Tendências de Receit
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   // Gerar configuração para o gráfico baseado nas categorias
-  const chartConfig: ChartConfig = {}
+  const chartConfig: ChartConfig = {};
   data.categories.forEach((category) => {
     chartConfig[category.name] = {
       label: category.name,
       color: category.color,
-    }
-  })
+    };
+  });
 
   return (
     <Card>
@@ -94,7 +109,10 @@ export default function IncomeTrendsChart({ data, title = "Tendências de Receit
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[400px]">
-          <LineChart data={data.chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+          <LineChart
+            data={data.chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+          >
             <XAxis
               dataKey="month"
               tickLine={false}
@@ -107,8 +125,8 @@ export default function IncomeTrendsChart({ data, title = "Tendências de Receit
               tickFormatter={(value) => `R$${(value / 1000).toFixed(0)}k`}
             />
             <ChartTooltip content={<CustomTooltip />} />
-            <Legend 
-              wrapperStyle={{ paddingTop: '20px' }}
+            <Legend
+              wrapperStyle={{ paddingTop: "20px" }}
               formatter={(value) => <span className="text-sm">{value}</span>}
             />
             {data.categories.map((category) => (
@@ -125,38 +143,56 @@ export default function IncomeTrendsChart({ data, title = "Tendências de Receit
             ))}
           </LineChart>
         </ChartContainer>
-        
+
         {/* Resumo das tendências */}
         <div className="mt-6 pt-6 border-t">
           <h4 className="font-semibold mb-3 text-sm">Resumo das Tendências:</h4>
           <div className="grid gap-2">
             {data.categories.map((category) => {
-              const categoryData = data.chartData.map(month => month[category.name] || 0)
-              const firstValue = categoryData.find(v => v > 0) || 0
-              const lastValue = categoryData[categoryData.length - 1] || 0
-              const trend = lastValue > firstValue ? 'increase' : lastValue < firstValue ? 'decrease' : 'stable'
-              const change = lastValue - firstValue
-              
-              if (lastValue === 0 && firstValue === 0) return null
-              
+              const categoryData = data.chartData.map((month) => {
+                const value = month[category.name] ?? 0;
+                return typeof value === "number" ? value : Number(value);
+              });
+              const firstValue: number = categoryData.find((v) => v > 0) ?? 0;
+              const lastValue: number =
+                categoryData.length > 0
+                  ? categoryData[categoryData.length - 1]
+                  : 0;
+              const trend =
+                lastValue > firstValue
+                  ? "increase"
+                  : lastValue < firstValue
+                    ? "decrease"
+                    : "stable";
+              const change = lastValue - firstValue;
+
+              if (lastValue === 0 && firstValue === 0) return null;
+
               return (
-                <div key={category.id} className="flex items-center justify-between text-sm">
+                <div
+                  key={category.id}
+                  className="flex items-center justify-between text-sm"
+                >
                   <div className="flex items-center gap-2">
-                    <div 
-                      className="w-3 h-3 rounded-full" 
+                    <div
+                      className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: category.color }}
                     />
                     <span>{category.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={
-                      trend === 'increase' ? 'text-green-600' :
-                      trend === 'decrease' ? 'text-red-600' :
-                      'text-muted-foreground'
-                    }>
-                      {trend === 'increase' && '↗'}
-                      {trend === 'decrease' && '↘'}
-                      {trend === 'stable' && '→'}
+                    <span
+                      className={
+                        trend === "increase"
+                          ? "text-income"
+                          : trend === "decrease"
+                            ? "text-expense"
+                            : "text-muted-foreground"
+                      }
+                    >
+                      {trend === "increase" && "↗"}
+                      {trend === "decrease" && "↘"}
+                      {trend === "stable" && "→"}
                       {change !== 0 && (
                         <span className="ml-1">
                           {formatCurrency(Math.abs(change))}
@@ -165,11 +201,11 @@ export default function IncomeTrendsChart({ data, title = "Tendências de Receit
                     </span>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

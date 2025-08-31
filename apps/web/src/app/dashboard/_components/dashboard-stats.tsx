@@ -70,16 +70,16 @@ export default function DashboardStats({
               {stat.title}
             </CardTitle>
             <stat.icon className={`h-4 w-4 ${
-              stat.trend === 'up' ? 'text-green-600' : 
-              stat.trend === 'down' ? 'text-red-600' :
-              stat.trend === 'warning' ? 'text-yellow-600' :
+              stat.trend === 'up' ? 'text-income' : 
+              stat.trend === 'down' ? 'text-expense' :
+              stat.trend === 'warning' ? 'text-warning' :
               'text-muted-foreground'
             }`} />
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${
-              stat.trend === 'up' ? 'text-green-600' :
-              stat.trend === 'down' && stat.title.includes('Saldo') ? 'text-red-600' :
+              stat.trend === 'up' ? 'text-income' :
+              stat.trend === 'down' && stat.title.includes('Saldo') ? 'text-expense' :
               ''
             }`}>
               {stat.value}

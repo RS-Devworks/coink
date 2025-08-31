@@ -54,7 +54,7 @@ export default function ForgotPasswordForm() {
       <Card>
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
-            <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
+            <CheckCircle className="mx-auto h-12 w-12 text-income" />
             <div>
               <h3 className="text-lg font-medium">Email enviado!</h3>
               <p className="text-sm text-muted-foreground mt-2">

@@ -138,7 +138,7 @@ export default function InstallmentProgressDialog({
             <div className="text-sm text-muted-foreground">Parcelas Pagas</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-income">
               R$ {paidAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <div className="text-sm text-muted-foreground">Valor Pago</div>
@@ -168,7 +168,7 @@ export default function InstallmentProgressDialog({
               <div 
                 key={installment.id}
                 className={`flex items-center justify-between p-3 rounded-lg border ${
-                  installment.isPaid ? 'bg-green-50 border-green-200' : 'bg-white'
+                  installment.isPaid ? 'bg-green-900 border-green-200' : 'bg-card'
                 }`}
               >
                 <div className="flex items-center gap-3">

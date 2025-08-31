@@ -7,11 +7,11 @@ import { Bar, BarChart, XAxis, YAxis } from "recharts"
 const chartConfig = {
   receitas: {
     label: "Receitas",
-    color: "hsl(var(--chart-1))",
+    color: "var(--income)",
   },
   despesas: {
     label: "Despesas", 
-    color: "hsl(var(--chart-2))",
+    color: "var(--expense)",
   },
 } satisfies ChartConfig
 

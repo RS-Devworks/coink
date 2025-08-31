@@ -236,10 +236,10 @@ export default function TransactionsTableContainer() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border">
+              <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
                 <div>
-                  <p className="text-sm font-medium text-green-800">Total de Receitas</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-sm font-medium">Total de Receitas</p>
+                  <p className="text-2xl font-bold text-income">
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
@@ -248,10 +248,10 @@ export default function TransactionsTableContainer() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border">
+              <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
                 <div>
-                  <p className="text-sm font-medium text-red-800">Total de Despesas</p>
-                  <p className="text-2xl font-bold text-red-600">
+                  <p className="text-sm font-medium">Total de Despesas</p>
+                  <p className="text-2xl font-bold text-expense">
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
@@ -260,15 +260,11 @@ export default function TransactionsTableContainer() {
                 </div>
               </div>
               
-              <div className={`flex items-center justify-between p-4 rounded-lg border ${
-                (tableData.summary as any).balance >= 0 ? 'bg-blue-50' : 'bg-orange-50'
-              }`}>
+              <div className={`flex items-center justify-between p-4 rounded-lg border`}>
                 <div>
-                  <p className={`text-sm font-medium ${
-                    (tableData.summary as any).balance >= 0 ? 'text-blue-800' : 'text-orange-800'
-                  }`}>Balanço</p>
+                  <p className={`text-sm font-medium`}>Balanço</p>
                   <p className={`text-2xl font-bold ${
-                    (tableData.summary as any).balance >= 0 ? 'text-blue-600' : 'text-orange-600'
+                    (tableData.summary as any).balance >= 0 ? 'text-income' : 'text-expense'
                   }`}>
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',

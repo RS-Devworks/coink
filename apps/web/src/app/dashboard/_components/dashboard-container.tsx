@@ -150,7 +150,16 @@ export default function DashboardContainer() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3 overflow-y-auto max-h-60 pr-2">
-                {dashboardData.recentTransactions.slice(0, 10).map((transaction) => (
+                {dashboardData.recentTransactions.slice(0, 10).map((transaction: {
+                  id: string;
+                  description: string;
+                  amount: number;
+                  type: 'INCOME' | 'EXPENSE';
+                  category?: {
+                    name: string;
+                    color: string;
+                  };
+                }) => (
                   <div key={transaction.id} className="flex items-center justify-between py-2 border-b border-border/40">
                     <div className="flex items-center gap-3">
                       <div 
@@ -163,7 +172,7 @@ export default function DashboardContainer() {
                       </div>
                     </div>
                     <span className={`font-semibold whitespace-nowrap ${
-                      transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+                      transaction.type === 'INCOME' ? 'text-income' : 'text-expense'
                     }`}>
                       {transaction.type === 'INCOME' ? '+' : '-'}
                       {new Intl.NumberFormat('pt-BR', {
@@ -184,16 +193,21 @@ export default function DashboardContainer() {
         </div>
 
         {/* Segunda metade - Gastos por categoria */}
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-col justify-between">
           {/* Gastos por categoria atual */}
           <Card className="h-80">
             <CardHeader>
               <CardTitle>Gastos por Categoria</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4 overflow-y-auto max-h-60 pr-2">
+              <div className="space-y-4 overflow-y-auto h-auto pr-2">
                 {dashboardData.expensesByCategory.length > 0 ? (
-                  dashboardData.expensesByCategory.map((category) => (
+                  dashboardData.expensesByCategory.map((category: {
+                    categoryId: string;
+                    categoryColor: string;
+                    categoryName: string;
+                    amount: number;
+                  }) => (
                     <div key={category.categoryId} className="flex items-center justify-between py-2">
                       <div className="flex items-center gap-3">
                         <div 
@@ -202,7 +216,7 @@ export default function DashboardContainer() {
                         />
                         <span className="font-medium">{category.categoryName}</span>
                       </div>
-                      <span className="text-lg font-semibold text-red-600 whitespace-nowrap">
+                      <span className="text-lg font-semibold text-expense whitespace-nowrap">
                         {new Intl.NumberFormat('pt-BR', {
                           style: 'currency',
                           currency: 'BRL'
@@ -232,7 +246,6 @@ export default function DashboardContainer() {
         {/* Tendências de Despesas */}
         <CategoryTrendsChart 
           data={dashboardData.categoryTrends || { chartData: [], categories: [] }} 
-          title="Tendências de Despesas por Categoria"
         />
         
         {/* Tendências de Receitas */}

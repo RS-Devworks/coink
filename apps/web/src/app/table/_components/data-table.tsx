@@ -181,8 +181,8 @@ export const columns: ColumnDef<Transaction>[] = [
       const isIncome = row.original.type === TransactionType.INCOME
 
       return (
-        <div className={`text-right font-medium ${
-          isIncome ? 'text-green-600' : 'text-red-600'
+        <div className={`text-left font-semibold ${
+          isIncome ? 'text-income' : 'text-expense'
         }`}>
           {isIncome ? '+' : '-'}
           {new Intl.NumberFormat("pt-BR", {

@@ -16,14 +16,14 @@ const paymentMethodLabels = {
 }
 
 const CHART_COLORS = [
-  'hsl(var(--chart-1))',
-  'hsl(var(--chart-2))', 
-  'hsl(var(--chart-3))',
-  'hsl(var(--chart-4))',
-  'hsl(var(--chart-5))',
-  'hsl(var(--chart-6))',
-  'hsl(var(--chart-7))',
-  'hsl(var(--chart-8))'
+  'var(--chart-1)',
+  'var(--chart-2)', 
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)',
+  'var(--chart-6)',
+  'var(--chart-7)',
+  'var(--chart-8)'
 ]
 
 interface PaymentMethodData {
@@ -58,10 +58,10 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     return (
-      <div className="bg-white p-3 border rounded-lg shadow-lg">
+      <div className="bg-card p-3 border rounded-lg shadow-lg">
         <p className="font-medium">{paymentMethodLabels[data.paymentMethod as keyof typeof paymentMethodLabels]}</p>
         <p className="text-sm">
-          <span className="font-medium text-green-600">{formatCurrency(data.amount)}</span>
+          <span className="font-semibold text-income">{formatCurrency(data.amount)}</span>
         </p>
         <p className="text-xs text-muted-foreground">
           {data.percentage}% do total
@@ -110,7 +110,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
   const incomeTotal = incomeData.reduce((sum, item) => sum + item.amount, 0)
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-2 h-full">
       {/* Gráfico de Despesas */}
       <Card>
         <CardHeader>
@@ -118,7 +118,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
           <CardDescription>
             Distribuição dos gastos por método de pagamento
           </CardDescription>
-          <div className="text-2xl font-bold text-red-600">
+          <div className="text-2xl font-bold text-expense">
             {formatCurrency(expenseTotal)}
           </div>
         </CardHeader>
@@ -126,7 +126,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
           {expenseChartData.length > 0 ? (
             <ChartContainer
               config={expenseChartConfig}
-              className="mx-auto aspect-square max-h-[300px]"
+              className="mx-auto aspect-square max-h-[600px]"
             >
               <PieChart>
                 <Pie
@@ -168,7 +168,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
           <CardDescription>
             Distribuição das receitas por método de recebimento
           </CardDescription>
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl font-bold text-income">
             {formatCurrency(incomeTotal)}
           </div>
         </CardHeader>
@@ -176,7 +176,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
           {incomeChartData.length > 0 ? (
             <ChartContainer
               config={incomeChartConfig}
-              className="mx-auto aspect-square max-h-[300px]"
+              className="mx-auto aspect-square max-h-[600px]"
             >
               <PieChart>
                 <Pie

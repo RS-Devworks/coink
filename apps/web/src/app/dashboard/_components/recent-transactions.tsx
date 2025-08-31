@@ -69,8 +69,8 @@ export default function RecentTransactions({ transactions, upcomingInstallments 
                 </div>
                 <div className={`font-medium ${
                   transaction.type === 'INCOME' 
-                    ? 'text-green-600' 
-                    : 'text-red-600'
+                    ? 'text-income' 
+                    : 'text-expense'
                 }`}>
                   {transaction.type === 'INCOME' ? '+' : '-'}
                   {formatCurrency(transaction.amount)}
