@@ -2,9 +2,10 @@ import Header from "@/components/home/header";
 import Footer from "@/components/home/footer";
 import Hero from "@/components/home/hero";
 import Features from "@/components/home/features";
-import Benefits from "@/components/home/benefits";
+import Benefits from "@/components/home/how-it-works";
 import Cta from "@/components/home/cta";
 import About from "@/components/home/about";
+import HowItWorks from "@/components/home/how-it-works";
 
 export default function Home() {
   return (
@@ -13,7 +14,7 @@ export default function Home() {
       <main>
         <Hero />
         <Features />
-        <Benefits />
+        <HowItWorks />
         <About />
         <Cta />
       </main>
