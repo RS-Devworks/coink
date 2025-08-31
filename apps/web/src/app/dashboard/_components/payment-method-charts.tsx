@@ -1,8 +1,8 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Cell, Pie, PieChart, ResponsiveContainer, Legend } from "recharts"
+import { ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart"
+import { Cell, Pie, PieChart, Legend } from "recharts"
 
 const paymentMethodLabels = {
   CASH: 'Dinheiro',
@@ -15,8 +15,15 @@ const paymentMethodLabels = {
   LOAN: 'Empréstimo'
 }
 
-const COLORS = [
-  '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF7C7C'
+const CHART_COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))', 
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+  'hsl(var(--chart-6))',
+  'hsl(var(--chart-7))',
+  'hsl(var(--chart-8))'
 ]
 
 interface PaymentMethodData {
@@ -36,7 +43,18 @@ const formatCurrency = (value: number) => {
   }).format(value)
 }
 
-const CustomTooltip = ({ active, payload }: any) => {
+interface TooltipProps {
+  active?: boolean
+  payload?: Array<{
+    payload: {
+      paymentMethod: string
+      amount: number
+      percentage: string
+    }
+  }>
+}
+
+const CustomTooltip = ({ active, payload }: TooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     return (
@@ -62,14 +80,31 @@ const prepareChartData = (data: PaymentMethodData[]) => {
     .map((item, index) => ({
       ...item,
       name: paymentMethodLabels[item.paymentMethod as keyof typeof paymentMethodLabels],
-      fill: COLORS[index % COLORS.length],
+      fill: CHART_COLORS[index % CHART_COLORS.length],
       percentage: ((item.amount / total) * 100).toFixed(1)
     }))
+}
+
+const createChartConfig = (data: Array<{
+  paymentMethod: string
+  name: string
+}>) => {
+  const config: ChartConfig = {}
+  data.forEach((item, index) => {
+    config[item.paymentMethod] = {
+      label: item.name,
+      color: CHART_COLORS[index % CHART_COLORS.length],
+    }
+  })
+  return config
 }
 
 export default function PaymentMethodCharts({ expenseData, incomeData }: PaymentMethodChartsProps) {
   const expenseChartData = prepareChartData(expenseData)
   const incomeChartData = prepareChartData(incomeData)
+  
+  const expenseChartConfig = createChartConfig(expenseChartData)
+  const incomeChartConfig = createChartConfig(incomeChartData)
 
   const expenseTotal = expenseData.reduce((sum, item) => sum + item.amount, 0)
   const incomeTotal = incomeData.reduce((sum, item) => sum + item.amount, 0)
@@ -90,7 +125,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
         <CardContent>
           {expenseChartData.length > 0 ? (
             <ChartContainer
-              config={{}}
+              config={expenseChartConfig}
               className="mx-auto aspect-square max-h-[300px]"
             >
               <PieChart>
@@ -140,7 +175,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
         <CardContent>
           {incomeChartData.length > 0 ? (
             <ChartContainer
-              config={{}}
+              config={incomeChartConfig}
               className="mx-auto aspect-square max-h-[300px]"
             >
               <PieChart>

@@ -380,6 +380,19 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Select onValueChange={(value) => setValue('isPaid', value === 'true')} disabled={isLoading}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecionar status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Pago</SelectItem>
+                <SelectItem value="false">Pendente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {canBeInstallment && (
             <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
               <div className="flex items-center space-x-2">
@@ -461,18 +474,6 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select onValueChange={(value) => setValue('isPaid', value === 'true')} disabled={isLoading}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecionar status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Pago</SelectItem>
-                      <SelectItem value="false">Pendente</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             )}
           </div>

@@ -4,13 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, Legend } from "recharts"
 
-interface CategoryTrendsData {
+interface IncomeTrendsData {
   chartData: Record<string, number | string>[]
   categories: { id: string; name: string; color: string }[]
 }
 
-interface CategoryTrendsChartProps {
-  data: CategoryTrendsData
+interface IncomeTrendsChartProps {
+  data: IncomeTrendsData
+  title?: string
 }
 
 const formatCurrency = (value: number) => {
@@ -45,7 +46,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
                 style={{ backgroundColor: entry.color }}
               />
               <span className="font-medium">{entry.dataKey}:</span>
-              <span className="ml-2 text-red-600">{formatCurrency(entry.value)}</span>
+              <span className="ml-2 text-green-600">{formatCurrency(entry.value)}</span>
             </p>
           ))}
       </div>
@@ -54,14 +55,14 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   return null
 }
 
-export default function CategoryTrendsChart({ data }: CategoryTrendsChartProps) {
+export default function IncomeTrendsChart({ data, title = "Tendências de Receitas por Categoria" }: IncomeTrendsChartProps) {
   if (!data.chartData.length || !data.categories.length) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Tendências por Categoria</CardTitle>
+          <CardTitle>{title}</CardTitle>
           <CardDescription>
-            Evolução dos gastos por categoria nos últimos 6 meses
+            Evolução das receitas por categoria nos últimos 6 meses
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[400px] text-muted-foreground">
@@ -86,9 +87,9 @@ export default function CategoryTrendsChart({ data }: CategoryTrendsChartProps) 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tendências por Categoria</CardTitle>
+        <CardTitle>{title}</CardTitle>
         <CardDescription>
-          Evolução dos gastos por categoria nos últimos 6 meses
+          Evolução das receitas por categoria nos últimos 6 meses
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -149,8 +150,8 @@ export default function CategoryTrendsChart({ data }: CategoryTrendsChartProps) 
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={
-                      trend === 'increase' ? 'text-red-600' :
-                      trend === 'decrease' ? 'text-green-600' :
+                      trend === 'increase' ? 'text-green-600' :
+                      trend === 'decrease' ? 'text-red-600' :
                       'text-muted-foreground'
                     }>
                       {trend === 'increase' && '↗'}

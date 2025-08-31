@@ -310,7 +310,6 @@ const createActionsColumn = (
             <DropdownMenuItem onClick={() => onEditTransaction(transaction)}>
               Editar
             </DropdownMenuItem>
-            <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
             {transaction.isInstallment && transaction.installmentGroupId && (
               <DropdownMenuItem onClick={() => onShowInstallments(transaction.installmentGroupId!)}>
                 Ver parcelas

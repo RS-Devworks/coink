@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, ChevronUp, Home, Inbox, PlusCircle, Search, Settings, User2, TrendingUp, CreditCard } from "lucide-react"
+import { Home, PlusCircle, User2, CreditCard } from "lucide-react"
 import AddTransactionModal from '@/components/add-transaction-modal'
 import UserMenu from '@/components/user-menu'
 
@@ -17,13 +17,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
 import { DollarSign } from "lucide-react"
 import Link from "next/link"
 
@@ -39,22 +32,12 @@ const data = {
       url: "/table",
       icon: CreditCard,
     },
-    {
-      title: "Relatórios",
-      url: "#",
-      icon: TrendingUp,
-    },
   ],
   navSecondary: [
     {
       title: "Perfil",
       url: "/profile",
       icon: User2,
-    },
-    {
-      title: "Configurações",
-      url: "#",
-      icon: Settings,
     },
   ],
 }

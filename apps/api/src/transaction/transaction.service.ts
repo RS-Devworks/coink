@@ -82,7 +82,7 @@ export class TransactionService {
         categoryId: createInstallmentDto.categoryId,
         userId,
         date: installmentDate,
-        dueDate: createInstallmentDto.dueDate ? new Date(createInstallmentDto.dueDate) : null,
+        dueDate: installmentDate,
         isPaid: i === 1 ? (createInstallmentDto.isPaid ?? true) : false, // Only first installment paid by default
         isInstallment: true,
         installmentNum: i,
@@ -556,6 +556,7 @@ export class TransactionService {
         amount: item._sum.amount || 0,
       })).sort((a, b) => b.amount - a.amount),
       categoryTrends: await this.getCategoryExpenseTrends(userId),
+      incomeTrends: await this.getCategoryIncomeTrends(userId),
       stats: {
         totalTransactions,
         pendingInstallments,
@@ -636,6 +637,80 @@ export class TransactionService {
     };
   }
 
+  async getCategoryIncomeTrends(userId: string) {
+    const monthsData: any[] = [];
+    const currentDate = new Date();
+    
+    // Últimos 6 meses incluindo o atual
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const monthName = date.toLocaleDateString('pt-BR', { month: 'short' });
+      
+      // Receitas por categoria neste mês
+      const monthlyIncomes = await this.prisma.transaction.groupBy({
+        by: ['categoryId'],
+        where: {
+          userId,
+          type: 'INCOME',
+          isPaid: true,
+          date: {
+            gte: new Date(year, month - 1, 1),
+            lte: new Date(year, month, 0, 23, 59, 59),
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+      });
+
+      monthsData.push({
+        month: monthName,
+        year: year,
+        monthNum: month,
+        incomes: monthlyIncomes,
+      });
+    }
+
+    // Buscar todas as categorias que aparecem nos dados
+    const allCategoryIds = new Set<string>();
+    monthsData.forEach(monthData => {
+      monthData.incomes.forEach(income => {
+        allCategoryIds.add(income.categoryId);
+      });
+    });
+
+    const categories = await this.prisma.category.findMany({
+      where: { 
+        id: { in: Array.from(allCategoryIds) },
+        type: 'INCOME'
+      },
+      select: { id: true, name: true, color: true },
+    });
+
+    // Transformar dados para formato do gráfico
+    const chartData = monthsData.map(monthData => {
+      const monthRow: any = { month: monthData.month };
+      
+      categories.forEach(category => {
+        const income = monthData.incomes.find(i => i.categoryId === category.id);
+        monthRow[category.name] = income?._sum.amount || 0;
+      });
+      
+      return monthRow;
+    });
+
+    return {
+      chartData,
+      categories: categories.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        color: cat.color || '#22c55e',
+      })),
+    };
+  }
+
   async getTableData(userId: string, filterDto: TransactionFilterDto) {
     const {
       type,
@@ -665,7 +740,7 @@ export class TransactionService {
 
     // Filtro por mês/ano específico tem prioridade sobre startDate/endDate
     if (month && year) {
-      // Para transações parceladas, filtrar por dueDate (vencimento)
+      // Para transações parceladas, filtrar por dueDate OU date (para flexibilidade)
       // Para outras transações, filtrar por date
       where.OR = [
         {
@@ -683,10 +758,20 @@ export class TransactionService {
           AND: [
             { isInstallment: true },
             {
-              dueDate: {
-                gte: new Date(year, month - 1, 1),
-                lt: new Date(year, month, 1),
-              },
+              OR: [
+                {
+                  date: {
+                    gte: new Date(year, month - 1, 1),
+                    lt: new Date(year, month, 1),
+                  },
+                },
+                {
+                  dueDate: {
+                    gte: new Date(year, month - 1, 1),
+                    lt: new Date(year, month, 1),
+                  },
+                },
+              ],
             },
           ],
         },
@@ -713,6 +798,7 @@ export class TransactionService {
           },
         },
         orderBy: [
+          { dueDate: 'desc' },
           { date: 'desc' },
           { createdAt: 'desc' },
         ],

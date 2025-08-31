@@ -54,7 +54,7 @@ export default function TransactionsTableContainer() {
     }
   }, [refetch])
 
-  // Gerar opções de meses (apenas o atual e próximo)
+  // Todos os meses disponíveis
   const allMonths = [
     { value: 1, label: 'Janeiro' },
     { value: 2, label: 'Fevereiro' },
@@ -70,30 +70,27 @@ export default function TransactionsTableContainer() {
     { value: 12, label: 'Dezembro' },
   ]
   
-  const currentMonth = currentDate.getMonth() + 1
-  const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1
-  
-  const months = allMonths.filter(month => 
-    month.value === currentMonth || month.value === nextMonth
-  )
+  // Usar todos os meses (permitindo transações futuras e passadas)
+  const months = allMonths
 
-  // Gerar opções de anos (apenas anos necessários: atual e próximo)
-  const years = [currentDate.getFullYear()]
-  if (currentMonth === 12) {
-    // Se estamos em dezembro, adicionar o próximo ano para janeiro
-    years.push(currentDate.getFullYear() + 1)
-  }
+  // Gerar opções de anos mais amplas (últimos 3 anos e próximos 2)
+  const currentYear = currentDate.getFullYear()
+  const years = [
+    currentYear - 2,
+    currentYear - 1, 
+    currentYear,
+    currentYear + 1,
+    currentYear + 2
+  ]
 
   const handleMonthChange = (month: string) => {
     const selectedMonth = parseInt(month)
-    let selectedYear = currentDate.getFullYear()
-    
-    // Se selecionou janeiro e estamos em dezembro, usar o próximo ano
-    if (selectedMonth === 1 && currentMonth === 12) {
-      selectedYear = currentDate.getFullYear() + 1
-    }
-    
-    setFilters(prev => ({ ...prev, month: selectedMonth, year: selectedYear, page: 1 }))
+    setFilters(prev => ({ 
+      ...prev, 
+      month: selectedMonth, 
+      year: prev.year || currentYear, // Manter o ano atual se não tiver selecionado
+      page: 1 
+    }))
   }
 
   const handleYearChange = (year: string) => {

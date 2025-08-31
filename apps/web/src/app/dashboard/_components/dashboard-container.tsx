@@ -7,6 +7,7 @@ import RecentTransactions from './recent-transactions'
 import FinancialChart from './financial-chart'
 import PaymentMethodCharts from './payment-method-charts'
 import CategoryTrendsChart from './category-trends-chart'
+import IncomeTrendsChart from './income-trends-chart'
 import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -136,57 +137,110 @@ export default function DashboardContainer() {
         pendingCount={statsData.pendingInstallments}
       />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="col-span-4">
+      {/* Seção de visão financeira reorganizada */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Primeira metade - Gráfico + Transações Recentes */}
+        <div className="space-y-4">
           <FinancialChart data={chartData} />
+          
+          {/* Transações recentes com scroll */}
+          <Card className="h-80">
+            <CardHeader>
+              <CardTitle>Transações Recentes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 overflow-y-auto max-h-60 pr-2">
+                {dashboardData.recentTransactions.slice(0, 10).map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between py-2 border-b border-border/40">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: transaction.category?.color || '#gray' }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium truncate">{transaction.description}</p>
+                        <p className="text-sm text-muted-foreground">{transaction.category?.name}</p>
+                      </div>
+                    </div>
+                    <span className={`font-semibold whitespace-nowrap ${
+                      transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'INCOME' ? '+' : '-'}
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(transaction.amount)}
+                    </span>
+                  </div>
+                ))}
+                {dashboardData.recentTransactions.length === 0 && (
+                  <div className="text-center text-muted-foreground py-8">
+                    Nenhuma transação recente
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        
-        <div className="col-span-3">
-          <RecentTransactions 
-            transactions={dashboardData.recentTransactions}
-            upcomingInstallments={dashboardData.upcomingInstallments}
+
+        {/* Segunda metade - Gastos por categoria */}
+        <div className="space-y-4">
+          {/* Gastos por categoria atual */}
+          <Card className="h-80">
+            <CardHeader>
+              <CardTitle>Gastos por Categoria</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 overflow-y-auto max-h-60 pr-2">
+                {dashboardData.expensesByCategory.length > 0 ? (
+                  dashboardData.expensesByCategory.map((category) => (
+                    <div key={category.categoryId} className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-4 h-4 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: category.categoryColor }}
+                        />
+                        <span className="font-medium">{category.categoryName}</span>
+                      </div>
+                      <span className="text-lg font-semibold text-red-600 whitespace-nowrap">
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        }).format(category.amount)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    Nenhuma despesa este mês
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Gráficos de métodos de pagamento */}
+          <PaymentMethodCharts
+            expenseData={dashboardData.expensesByPaymentMethod || []}
+            incomeData={dashboardData.incomeByPaymentMethod || []}
           />
         </div>
       </div>
 
-      {/* Gráficos de métodos de pagamento */}
-      <PaymentMethodCharts
-        expenseData={dashboardData.expensesByPaymentMethod || []}
-        incomeData={dashboardData.incomeByPaymentMethod || []}
-      />
-
-      {/* Gráfico de tendências por categoria */}
-      <CategoryTrendsChart data={dashboardData.categoryTrends || { chartData: [], categories: [] }} />
-
-      {/* Gastos por categoria */}
-      {dashboardData.expensesByCategory.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Gastos por Categoria (Mês Atual)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {dashboardData.expensesByCategory.slice(0, 5).map((category) => (
-                <div key={category.categoryId} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.categoryColor }}
-                    />
-                    <span className="font-medium">{category.categoryName}</span>
-                  </div>
-                  <span className="text-lg font-semibold text-red-600">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(category.amount)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Seção de tendências - lado a lado */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Tendências de Despesas */}
+        <CategoryTrendsChart 
+          data={dashboardData.categoryTrends || { chartData: [], categories: [] }} 
+          title="Tendências de Despesas por Categoria"
+        />
+        
+        {/* Tendências de Receitas */}
+        <IncomeTrendsChart 
+          data={dashboardData.incomeTrends || { chartData: [], categories: [] }} 
+          title="Tendências de Receitas por Categoria"
+        />
+      </div>
     </div>
   )
 }

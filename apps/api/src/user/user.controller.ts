@@ -9,6 +9,7 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -60,5 +61,34 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+
+  // Endpoints específicos para o perfil do usuário logado
+  @Get('profile/me')
+  @UseGuards(AuthGuard)
+  async getProfile(@Request() req: any) {
+    return this.userService.findOne(req.user.id);
+  }
+
+  @Patch('profile/me')
+  @UseGuards(AuthGuard)
+  async updateProfile(@Request() req: any, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(req.user.id, updateUserDto);
+  }
+
+  @Patch('profile/me/password')
+  @UseGuards(AuthGuard)
+  async updateProfilePassword(
+    @Request() req: any,
+    @Body() updatePasswordDto: UpdateUserPasswordDto,
+  ) {
+    return this.userService.updatePassword(req.user.id, updatePasswordDto);
+  }
+
+  @Delete('profile/me')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteProfile(@Request() req: any) {
+    return this.userService.remove(req.user.id);
   }
 }

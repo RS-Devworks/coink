@@ -2,29 +2,28 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-
-const chartData = [
-  { month: "Jan", receitas: 4200, despesas: 3800 },
-  { month: "Fev", receitas: 3800, despesas: 3200 },
-  { month: "Mar", receitas: 5200, despesas: 4100 },
-  { month: "Abr", receitas: 4800, despesas: 3600 },
-  { month: "Mai", receitas: 5600, despesas: 4200 },
-  { month: "Jun", receitas: 5240, despesas: 3180 }
-]
+import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 const chartConfig = {
   receitas: {
     label: "Receitas",
-    color: "var(--color-green-600)",
+    color: "hsl(var(--chart-1))",
   },
   despesas: {
     label: "Despesas", 
-    color: "var(--color-red-600)",
+    color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig
 
-export default function FinancialChart() {
+interface FinancialChartProps {
+  data: Array<{
+    name: string
+    receitas: number
+    despesas: number
+  }>
+}
+
+export default function FinancialChart({ data }: FinancialChartProps) {
   return (
     <Card className="col-span-4">
       <CardHeader>
@@ -35,9 +34,9 @@ export default function FinancialChart() {
       </CardHeader>
       <CardContent className="pl-2">
         <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={data}>
             <XAxis
-              dataKey="month"
+              dataKey="name"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
