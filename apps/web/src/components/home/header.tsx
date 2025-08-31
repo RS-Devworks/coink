@@ -68,11 +68,8 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
               <Button asChild>
-                <Link href="/api/auth/logout">Sair</Link>
+                <Link href="/dashboard">Dashboard</Link>
               </Button>
             </>
           )}
