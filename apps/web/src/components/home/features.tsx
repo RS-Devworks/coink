@@ -14,11 +14,78 @@ import {
   PieChart,
   Users,
 } from "lucide-react";
+import { BlurFade } from "../magicui/blur-fade";
+import { constants } from "@/constants/landing-page";
+
+interface FeatureCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+}
+
+const FeatureCard = ({ title, description, icon }: FeatureCardProps) => {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+          {icon}
+        </div>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+    </Card>
+  );
+};
 
 const Features = () => {
+  const features = [
+    {
+      title: "Categorização Inteligente",
+      description:
+        "Classifique suas transações em categorias personalizáveis para melhor organização",
+      icon: <PieChart className="h-6 w-6 text-primary" />,
+    },
+    {
+      title: "Dashboard Completo",
+      description:
+        "Visualize um resumo completo de suas finanças em um painel personalizado",
+      icon: <BarChart3 className="h-6 w-6 text-primary" />,
+    },
+    {
+      title: "Insights Financeiros",
+      description:
+        "Relatórios detalhados que ajudam a entender seus hábitos de gastos",
+      icon: <TrendingUp className="h-6 w-6 text-primary" />,
+    },
+    {
+      title: "Segurança Garantida",
+      description:
+        "Seus dados financeiros protegidos com autenticação segura e criptografia",
+      icon: <Shield className="h-6 w-6 text-primary" />,
+    },
+    {
+      title: "Controle Total",
+      description:
+        "Adicione receitas e despesas facilmente com filtros avançados por data e categoria",
+      icon: <DollarSign className="h-6 w-6 text-primary" />,
+    },
+    {
+      title: "Interface Intuitiva",
+      description:
+        "Navegação fácil e acesso rápido às suas informações financeiras",
+      icon: <Users className="h-6 w-6 text-primary" />,
+    },
+  ];
+
+  const BLUR_FADE_TIME = constants.BLUR_FADE_TIME;
+
   return (
-    <section id="features" className="py-20 bg-muted/50">
-      <div className="container mx-auto px-4">
+    <section id="features" className="bg-muted/50 h-screen flex items-center">
+      <BlurFade
+        className="container mx-auto px-4"
+        delay={BLUR_FADE_TIME}
+        duration={BLUR_FADE_TIME}
+      >
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Recursos Principais
@@ -30,85 +97,21 @@ const Features = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <PieChart className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Categorização Inteligente</CardTitle>
-              <CardDescription>
-                Classifique suas transações em categorias personalizáveis para
-                melhor organização
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <BarChart3 className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Dashboard Completo</CardTitle>
-              <CardDescription>
-                Visualize um resumo completo de suas finanças em um painel
-                personalizado
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Insights Financeiros</CardTitle>
-              <CardDescription>
-                Relatórios detalhados que ajudam a entender seus hábitos de
-                gastos
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Segurança Garantida</CardTitle>
-              <CardDescription>
-                Seus dados financeiros protegidos com autenticação segura e
-                criptografia
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <DollarSign className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Controle Total</CardTitle>
-              <CardDescription>
-                Adicione receitas e despesas facilmente com filtros avançados
-                por data e categoria
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Interface Intuitiva</CardTitle>
-              <CardDescription>
-                Design moderno e responsivo que torna o gerenciamento financeiro
-                simples
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          {features.map((feature, index) => (
+            <BlurFade
+              key={index}
+              delay={index * BLUR_FADE_TIME}
+              duration={BLUR_FADE_TIME}
+            >
+              <FeatureCard
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+              />
+            </BlurFade>
+          ))}
         </div>
-      </div>
+      </BlurFade>
     </section>
   );
 };

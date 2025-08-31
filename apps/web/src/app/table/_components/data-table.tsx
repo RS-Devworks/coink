@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   ColumnDef,
@@ -11,11 +11,11 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+} from "@tanstack/react-table"
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -24,8 +24,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -33,46 +33,38 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { useState } from "react";
-import {
-  Transaction,
-  PaymentMethod,
-  TransactionType,
-} from "@/@types/transaction";
-import {
-  deleteTransaction,
-  deleteInstallmentGroup,
-  markInstallmentAsPaid,
-} from "@/server/actions/transactions";
-import { toast } from "sonner";
-import InstallmentProgressDialog from "./installment-progress-dialog";
-import EditTransactionModal from "@/components/edit-transaction-modal";
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { useState } from "react"
+import { Transaction, PaymentMethod, TransactionType } from "@/@types/transaction"
+import { deleteTransaction, deleteInstallmentGroup, markInstallmentAsPaid } from '@/server/actions/transactions'
+import { toast } from 'sonner'
+import InstallmentProgressDialog from './installment-progress-dialog'
+import EditTransactionModal from '@/components/edit-transaction-modal'
 
 // Mapeamento de colunas para nomes em português
 const columnLabels: Record<string, string> = {
-  description: "Descrição",
-  amount: "Valor",
-  type: "Tipo",
-  paymentMethod: "Método de Pagamento",
-  date: "Data",
-  category: "Categoria",
-  isPaid: "Status",
-};
+  description: 'Descrição',
+  amount: 'Valor',
+  type: 'Tipo',
+  paymentMethod: 'Método de Pagamento',
+  date: 'Data',
+  category: 'Categoria',
+  isPaid: 'Status'
+}
 
 const paymentMethodLabels: Record<PaymentMethod, string> = {
-  CASH: "Dinheiro",
-  DEBIT_CARD: "Cartão Débito",
-  CREDIT_CARD: "Cartão Crédito",
-  PIX: "PIX",
-  BANK_TRANSFER: "Transferência",
-  CHECK: "Cheque",
-  BOLETO: "Boleto",
-  LOAN: "Empréstimo",
-};
+  CASH: 'Dinheiro',
+  DEBIT_CARD: 'Cartão Débito',
+  CREDIT_CARD: 'Cartão Crédito',
+  PIX: 'PIX',
+  BANK_TRANSFER: 'Transferência',
+  CHECK: 'Cheque',
+  BOLETO: 'Boleto',
+  LOAN: 'Empréstimo'
+}
 
 export const columns: ColumnDef<Transaction>[] = [
   {
@@ -108,20 +100,19 @@ export const columns: ColumnDef<Transaction>[] = [
           Descrição
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      );
+      )
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div
-          className="w-3 h-3 rounded-full flex-shrink-0"
-          style={{ backgroundColor: row.original.category.color || "#gray" }}
+        <div 
+          className="w-3 h-3 rounded-full flex-shrink-0" 
+          style={{ backgroundColor: row.original.category.color || '#gray' }}
         />
         <div>
           <div className="font-medium">{row.original.description}</div>
           {row.original.isInstallment && (
             <div className="text-sm text-muted-foreground">
-              Parcela {row.original.installmentNum}/
-              {row.original.totalInstallments}
+              Parcela {row.original.installmentNum}/{row.original.totalInstallments}
             </div>
           )}
           {row.original.isRecurring && (
@@ -144,10 +135,12 @@ export const columns: ColumnDef<Transaction>[] = [
           Categoria
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      );
+      )
     },
     cell: ({ row }) => (
-      <Badge variant="secondary">{row.original.category.name}</Badge>
+      <Badge variant="secondary">
+        {row.original.category.name}
+      </Badge>
     ),
   },
   {
@@ -161,7 +154,7 @@ export const columns: ColumnDef<Transaction>[] = [
           Método
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      );
+      )
     },
     cell: ({ row }) => (
       <span className="text-sm">
@@ -181,25 +174,23 @@ export const columns: ColumnDef<Transaction>[] = [
           Valor
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      );
+      )
     },
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const isIncome = row.original.type === TransactionType.INCOME;
+      const amount = parseFloat(row.getValue("amount"))
+      const isIncome = row.original.type === TransactionType.INCOME
 
       return (
-        <div
-          className={`text-right font-medium ${
-            isIncome ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {isIncome ? "+" : "-"}
+        <div className={`text-right font-medium ${
+          isIncome ? 'text-green-600' : 'text-red-600'
+        }`}>
+          {isIncome ? '+' : '-'}
           {new Intl.NumberFormat("pt-BR", {
             style: "currency",
             currency: "BRL",
           }).format(amount)}
         </div>
-      );
+      )
     },
   },
   {
@@ -213,17 +204,14 @@ export const columns: ColumnDef<Transaction>[] = [
           Data
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      );
+      )
     },
     cell: ({ row }) => (
       <div>
-        <div>
-          {format(new Date(row.original.date), "dd/MM/yyyy", { locale: ptBR })}
-        </div>
+        <div>{format(new Date(row.original.date), "dd/MM/yyyy", { locale: ptBR })}</div>
         {row.original.dueDate && (
           <div className="text-xs text-muted-foreground">
-            Venc:{" "}
-            {format(new Date(row.original.dueDate), "dd/MM", { locale: ptBR })}
+            Venc: {format(new Date(row.original.dueDate), "dd/MM", { locale: ptBR })}
           </div>
         )}
       </div>
@@ -233,15 +221,15 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "isPaid",
     header: "Status",
     cell: ({ row }) => {
-      const isPaid = row.original.isPaid;
+      const isPaid = row.original.isPaid
       return (
         <Badge variant={isPaid ? "default" : "destructive"}>
           {isPaid ? "Pago" : "Pendente"}
         </Badge>
-      );
+      )
     },
   },
-];
+]
 
 // Separar as colunas e a função de ações para ter acesso ao estado do componente
 const createActionsColumn = (
@@ -251,146 +239,124 @@ const createActionsColumn = (
   id: "actions",
   enableHiding: false,
   cell: ({ row }: { row: any }) => {
-    const transaction = row.original as Transaction;
+    const transaction = row.original as Transaction
 
     const handleMarkAsPaid = async () => {
       try {
-        const newStatus = !transaction.isPaid;
-        const result = await markInstallmentAsPaid(transaction.id, newStatus);
+        const newStatus = !transaction.isPaid
+        const result = await markInstallmentAsPaid(transaction.id, newStatus)
         if (result.success) {
-          toast.success(
-            `Transação marcada como ${newStatus ? "paga" : "não paga"}`
-          );
-          window.location.reload(); // Recarregar dados
+          toast.success(`Transação marcada como ${newStatus ? 'paga' : 'não paga'}`)
+          window.location.reload() // Recarregar dados
         } else {
-          toast.error(result.error);
+          toast.error(result.error)
         }
       } catch (error) {
-        console.error("Erro ao atualizar status:", error);
-        toast.error("Erro ao atualizar status");
+        console.error('Erro ao atualizar status:', error)
+        toast.error('Erro ao atualizar status')
       }
-    };
+    }
 
     const handleDelete = async () => {
-      try {
-        if (transaction.isInstallment && transaction.installmentGroupId) {
-          // Confirmar exclusão de todas as parcelas
-          if (
-            confirm(
-              `Deseja excluir todas as parcelas deste parcelamento? Esta ação não pode ser desfeita.`
-            )
-          ) {
-            const result = await deleteInstallmentGroup(
-              transaction.installmentGroupId
-            );
-            if (result.success) {
-              toast.success("Parcelamento excluído com sucesso");
-              window.location.reload(); // Recarregar dados
-            } else {
-              toast.error(result.error);
-            }
-          }
-        } else {
-          // Confirmar exclusão de transação simples
-          if (
-            confirm(
-              "Deseja excluir esta transação? Esta ação não pode ser desfeita."
-            )
-          ) {
-            const result = await deleteTransaction(transaction.id);
-            if (result.success) {
-              toast.success("Transação excluída com sucesso");
-              window.location.reload(); // Recarregar dados
-            } else {
-              toast.error(result.error);
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Erro ao excluir:", error);
-        toast.error("Erro ao excluir transação");
-      }
-    };
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Abrir menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Ações</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(transaction.id)}
-          >
-            Copiar ID
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleMarkAsPaid}>
-            {transaction.isPaid ? "Marcar como não pago" : "Marcar como pago"}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onEditTransaction(transaction)}>
-            Editar
-          </DropdownMenuItem>
-          <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
-          {transaction.isInstallment && transaction.installmentGroupId && (
-            <DropdownMenuItem
-              onClick={() =>
-                onShowInstallments(transaction.installmentGroupId!)
+        try {
+          if (transaction.isInstallment && transaction.installmentGroupId) {
+            // Confirmar exclusão de todas as parcelas
+            if (confirm(`Deseja excluir todas as parcelas deste parcelamento? Esta ação não pode ser desfeita.`)) {
+              const result = await deleteInstallmentGroup(transaction.installmentGroupId)
+              if (result.success) {
+                toast.success('Parcelamento excluído com sucesso')
+                window.location.reload() // Recarregar dados
+              } else {
+                toast.error(result.error)
               }
+            }
+          } else {
+            // Confirmar exclusão de transação simples
+            if (confirm('Deseja excluir esta transação? Esta ação não pode ser desfeita.')) {
+              const result = await deleteTransaction(transaction.id)
+              if (result.success) {
+                toast.success('Transação excluída com sucesso')
+                window.location.reload() // Recarregar dados
+              } else {
+                toast.error(result.error)
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Erro ao excluir:', error)
+          toast.error('Erro ao excluir transação')
+        }
+      }
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Abrir menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(transaction.id)}
             >
-              Ver parcelas
+              Copiar ID
             </DropdownMenuItem>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive" onClick={handleDelete}>
-            {transaction.isInstallment ? "Excluir Parcelamento" : "Excluir"}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  },
-});
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleMarkAsPaid}>
+              {transaction.isPaid ? 'Marcar como não pago' : 'Marcar como pago'}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEditTransaction(transaction)}>
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
+            {transaction.isInstallment && transaction.installmentGroupId && (
+              <DropdownMenuItem onClick={() => onShowInstallments(transaction.installmentGroupId!)}>
+                Ver parcelas
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              className="text-destructive"
+              onClick={handleDelete}
+            >
+              {transaction.isInstallment ? 'Excluir Parcelamento' : 'Excluir'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+})
 
 interface DataTableProps {
-  data: Transaction[];
-  loading?: boolean;
+  data: Transaction[]
+  loading?: boolean
 }
 
 export function DataTable({ data, loading }: DataTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [installmentDialog, setInstallmentDialog] = useState<{
-    open: boolean;
-    groupId: string;
-  }>({
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+  const [installmentDialog, setInstallmentDialog] = useState<{ open: boolean; groupId: string }>({
     open: false,
-    groupId: "",
-  });
-  const [editDialog, setEditDialog] = useState<{
-    open: boolean;
-    transaction: Transaction | null;
-  }>({
+    groupId: ''
+  })
+  const [editDialog, setEditDialog] = useState<{ open: boolean; transaction: Transaction | null }>({
     open: false,
-    transaction: null,
-  });
+    transaction: null
+  })
 
   const handleShowInstallments = (groupId: string) => {
-    setInstallmentDialog({ open: true, groupId });
-  };
+    setInstallmentDialog({ open: true, groupId })
+  }
 
   const handleEditTransaction = (transaction: Transaction) => {
-    setEditDialog({ open: true, transaction });
-  };
+    setEditDialog({ open: true, transaction })
+  }
 
-  const allColumns = [
-    ...columns,
-    createActionsColumn(handleShowInstallments, handleEditTransaction),
-  ];
+  const allColumns = [...columns, createActionsColumn(handleShowInstallments, handleEditTransaction)]
 
   const table = useReactTable({
     data,
@@ -409,7 +375,7 @@ export function DataTable({ data, loading }: DataTableProps) {
       columnVisibility,
       rowSelection,
     },
-  });
+  })
 
   if (loading) {
     return (
@@ -419,7 +385,7 @@ export function DataTable({ data, loading }: DataTableProps) {
           <div className="h-10 w-80 bg-muted rounded-md animate-pulse" />
           <div className="h-10 w-32 bg-muted rounded-md animate-pulse" />
         </div>
-
+        
         {/* Skeleton para tabela */}
         <div className="border rounded-md">
           <div className="h-12 bg-muted border-b animate-pulse" />
@@ -437,68 +403,62 @@ export function DataTable({ data, loading }: DataTableProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   const handleBulkMarkAsPaid = async (isPaid: boolean) => {
-    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const selectedRows = table.getFilteredSelectedRowModel().rows
     if (selectedRows.length === 0) {
-      toast.error("Selecione pelo menos uma transação");
-      return;
+      toast.error('Selecione pelo menos uma transação')
+      return
     }
 
     try {
-      const promises = selectedRows.map((row) => {
-        const transaction = row.original as Transaction;
-        return markInstallmentAsPaid(transaction.id, isPaid);
-      });
+      const promises = selectedRows.map(row => {
+        const transaction = row.original as Transaction
+        return markInstallmentAsPaid(transaction.id, isPaid)
+      })
 
-      await Promise.all(promises);
-      toast.success(
-        `${selectedRows.length} transação(ões) marcada(s) como ${isPaid ? "paga(s)" : "não paga(s)"}`
-      );
-      window.location.reload();
+      await Promise.all(promises)
+      toast.success(`${selectedRows.length} transação(ões) marcada(s) como ${isPaid ? 'paga(s)' : 'não paga(s)'}`)
+      window.location.reload()
     } catch (error) {
-      console.error("Erro ao atualizar transações:", error);
-      toast.error("Erro ao atualizar transações");
+      console.error('Erro ao atualizar transações:', error)
+      toast.error('Erro ao atualizar transações')
     }
-  };
+  }
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filtrar transações..."
-          value={
-            (table.getColumn("description")?.getFilterValue() as string) ?? ""
-          }
+          value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("description")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
-
+        
         {table.getFilteredSelectedRowModel().rows.length > 0 && (
           <div className="flex gap-2 ml-4">
-            <Button
-              variant="outline"
+            <Button 
+              variant="outline" 
               size="sm"
               onClick={() => handleBulkMarkAsPaid(true)}
             >
-              Marcar como pago (
-              {table.getFilteredSelectedRowModel().rows.length})
+              Marcar como pago ({table.getFilteredSelectedRowModel().rows.length})
             </Button>
-            <Button
-              variant="outline"
+            <Button 
+              variant="outline" 
               size="sm"
               onClick={() => handleBulkMarkAsPaid(false)}
             >
-              Marcar como não pago (
-              {table.getFilteredSelectedRowModel().rows.length})
+              Marcar como não pago ({table.getFilteredSelectedRowModel().rows.length})
             </Button>
           </div>
         )}
-
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -521,7 +481,7 @@ export function DataTable({ data, loading }: DataTableProps) {
                   >
                     {columnLabels[column.id] || column.id}
                   </DropdownMenuCheckboxItem>
-                );
+                )
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -541,7 +501,7 @@ export function DataTable({ data, loading }: DataTableProps) {
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -604,13 +564,11 @@ export function DataTable({ data, loading }: DataTableProps) {
       {/* Diálogo de progresso das parcelas */}
       <InstallmentProgressDialog
         open={installmentDialog.open}
-        onOpenChange={(open) =>
-          setInstallmentDialog((prev) => ({ ...prev, open }))
-        }
+        onOpenChange={(open) => setInstallmentDialog(prev => ({ ...prev, open }))}
         groupId={installmentDialog.groupId}
         onUpdate={() => {
           // Recarregar dados quando uma parcela for atualizada
-          window.location.reload();
+          window.location.reload()
         }}
       />
 
@@ -618,13 +576,13 @@ export function DataTable({ data, loading }: DataTableProps) {
       {editDialog.transaction && (
         <EditTransactionModal
           open={editDialog.open}
-          onOpenChange={(open) => setEditDialog((prev) => ({ ...prev, open }))}
+          onOpenChange={(open) => setEditDialog(prev => ({ ...prev, open }))}
           transaction={editDialog.transaction}
           onTransactionUpdated={() => {
-            window.location.reload();
+            window.location.reload()
           }}
         />
       )}
     </div>
-  );
+  )
 }

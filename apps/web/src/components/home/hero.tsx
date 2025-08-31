@@ -1,10 +1,9 @@
 import React from "react";
-import { Badge } from "../ui/badge";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { GridPattern } from "../magicui/grid-pattern";
 import { cn } from "@/lib/utils";
 import { AnimatedGridPattern } from "../magicui/animated-grid-pattern";
+import { AuroraText } from "../magicui/aurora-text";
 
 const Hero = () => {
   return (
@@ -30,12 +29,9 @@ const Hero = () => {
 
         {/* Content on top of pattern */}
         <div className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center h-full">
-          <Badge className="mb-6" variant="secondary">
-            Gerenciamento Financeiro Simplificado
-          </Badge>
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Controle suas finanças com
-            <span className="text-primary"> Coink</span>
+            Controle suas <AuroraText>finanças</AuroraText> com{" "}
+            <AuroraText>Coink</AuroraText>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Categorize suas transações, acompanhe seus gastos e receba insights
@@ -43,16 +39,17 @@ const Hero = () => {
             simples e intuitiva.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register">
-              <Button size="lg" className="w-full sm:w-auto">
-                Começar Grátis
-              </Button>
-            </Link>
-            <Link href="#features">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                Conhecer Recursos
-              </Button>
-            </Link>
+            <Button size="lg" className="w-full sm:w-auto" asChild>
+              <Link href="/register">Começar Grátis</Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="w-full sm:w-auto"
+              asChild
+            >
+              <Link href="#features">Conhecer Recursos</Link>
+            </Button>
           </div>
         </div>
       </div>

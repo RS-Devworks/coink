@@ -408,7 +408,7 @@ export class TransactionService {
 
     // Deduplicar transações parceladas (mostrar apenas uma por grupo)
     const seenGroups = new Set();
-    const recentTransactions = [];
+    const recentTransactions: any[] = [];
     
     for (const transaction of allRecentTransactions) {
       if (transaction.isInstallment && transaction.installmentGroupId) {
@@ -566,7 +566,7 @@ export class TransactionService {
   }
 
   async getCategoryExpenseTrends(userId: string) {
-    const monthsData = [];
+    const monthsData: any[] = [];
     const currentDate = new Date();
     
     // Últimos 6 meses incluindo o atual
@@ -602,7 +602,7 @@ export class TransactionService {
     }
 
     // Buscar todas as categorias que aparecem nos dados
-    const allCategoryIds = new Set();
+    const allCategoryIds = new Set<string>();
     monthsData.forEach(monthData => {
       monthData.expenses.forEach(expense => {
         allCategoryIds.add(expense.categoryId);
