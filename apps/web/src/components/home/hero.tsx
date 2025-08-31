@@ -4,6 +4,8 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatedGridPattern } from "../magicui/animated-grid-pattern";
 import { AuroraText } from "../magicui/aurora-text";
+import { BlurFade } from "../magicui/blur-fade";
+import { constants } from "@/constants/landing-page";
 
 const Hero = () => {
   return (
@@ -28,7 +30,12 @@ const Hero = () => {
         </div>
 
         {/* Content on top of pattern */}
-        <div className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center h-full">
+        <BlurFade
+          delay={constants.BLUR_FADE_TIME}
+          duration={constants.BLUR_FADE_TIME}
+          inView
+          className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center h-full"
+        >
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Controle suas <AuroraText>finanças</AuroraText> com{" "}
             <AuroraText>Coink</AuroraText>
@@ -51,7 +58,7 @@ const Hero = () => {
               <Link href="#features">Conhecer Recursos</Link>
             </Button>
           </div>
-        </div>
+        </BlurFade>
       </div>
     </section>
   );

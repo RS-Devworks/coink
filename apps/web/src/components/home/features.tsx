@@ -25,7 +25,7 @@ interface FeatureCardProps {
 
 const FeatureCard = ({ title, description, icon }: FeatureCardProps) => {
   return (
-    <Card>
+    <Card className="">
       <CardHeader>
         <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
           {icon}
@@ -54,7 +54,7 @@ const Features = () => {
     {
       title: "Insights Financeiros",
       description:
-        "Relatórios detalhados que ajudam a entender seus hábitos de gastos",
+        "Relatórios detalhados que ajudam a entender suas receitas e gastos de forma clara e objetiva",
       icon: <TrendingUp className="h-6 w-6 text-primary" />,
     },
     {
@@ -72,7 +72,7 @@ const Features = () => {
     {
       title: "Interface Intuitiva",
       description:
-        "Navegação fácil e acesso rápido às suas informações financeiras",
+        "Navegação intuitiva, fácil e acesso rápido às suas informações financeiras",
       icon: <Users className="h-6 w-6 text-primary" />,
     },
   ];
@@ -85,6 +85,7 @@ const Features = () => {
         className="container mx-auto px-4"
         delay={BLUR_FADE_TIME}
         duration={BLUR_FADE_TIME}
+        inView
       >
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -102,6 +103,7 @@ const Features = () => {
               key={index}
               delay={index * BLUR_FADE_TIME}
               duration={BLUR_FADE_TIME}
+              inView
             >
               <FeatureCard
                 title={feature.title}

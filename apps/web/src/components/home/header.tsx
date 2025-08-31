@@ -1,9 +1,13 @@
+"use client";
 import React from "react";
 import { DollarSign } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { getSession } from "@/lib/auth";
 
 const Header = () => {
+  const session = getSession();
+
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -12,32 +16,66 @@ const Header = () => {
           <span className="text-2xl font-bold">Coink</span>
         </div>
         <nav className="hidden md:flex items-center space-x-6">
-          <a
+          <Link
             href="#features"
             className="text-sm font-medium hover:underline underline-offset-4"
+            scroll={false}
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("features")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
           >
             Recursos
-          </a>
-          <a
-            href="#benefits"
+          </Link>
+          <Link
+            href="#how-it-works"
             className="text-sm font-medium hover:underline underline-offset-4"
+            scroll={false}
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("how-it-works")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
           >
-            Benefícios
-          </a>
-          <a
+            Como Funciona
+          </Link>
+          <Link
             href="#about"
             className="text-sm font-medium hover:underline underline-offset-4"
+            scroll={false}
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .getElementById("about")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
           >
             Sobre
-          </a>
+          </Link>
         </nav>
         <div className="flex items-center space-x-4">
-          <Link href="/login">
-            <Button variant="ghost">Entrar</Button>
-          </Link>
-          <Link href="/register">
-            <Button>Cadastrar</Button>
-          </Link>
+          {!session ? (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Entrar</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/register">Cadastrar</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/api/auth/logout">Sair</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>
