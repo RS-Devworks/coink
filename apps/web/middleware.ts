@@ -12,6 +12,8 @@ export default withAuth(
           pathname === '/login' ||
           pathname === '/register' ||
           pathname === '/forgot-password' ||
+          pathname === '/dashboard' ||
+          pathname === '/table' ||
           pathname.startsWith('/api/auth') ||
           pathname.startsWith('/_next') ||
           pathname.startsWith('/favicon')
