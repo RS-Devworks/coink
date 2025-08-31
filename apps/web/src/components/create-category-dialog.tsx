@@ -73,8 +73,7 @@ export default function CreateCategoryDialog({
     setIsLoading(true)
     
     try {
-      const result = await createCategory(data)
-      
+      const result = await createCategory({ ...data, type: data.type as TransactionType })
       if (result.success) {
         toast.success('Categoria criada com sucesso!')
         onCategoryCreated(result.data)

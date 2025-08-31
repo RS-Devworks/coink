@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 import { TransactionType, PaymentMethod, CreateTransactionRequest, Category } from '@/@types/transaction'
 import CurrencyInput from '@/components/ui/currency-input'
 import CreateCategoryDialog from '@/components/create-category-dialog'
+import { toast } from 'sonner'
 
 const transactionSchema = z.object({
   description: z.string().min(1, 'Descrição é obrigatória'),
@@ -27,7 +28,7 @@ const transactionSchema = z.object({
   type: z.enum(['INCOME', 'EXPENSE']),
   paymentMethod: z.enum(['CASH', 'DEBIT_CARD', 'CREDIT_CARD', 'PIX', 'BANK_TRANSFER', 'CHECK', 'BOLETO', 'LOAN']),
   categoryId: z.string().min(1, 'Categoria é obrigatória'),
-  date: z.date({ required_error: "Data é obrigatória" }),
+  date: z.date({ message: "Data é obrigatória" }),
   dueDate: z.date().optional(),
   isPaid: z.boolean().default(true),
   isRecurring: z.boolean().default(false),
@@ -72,7 +73,7 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
     setValue,
     watch,
   } = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
+    resolver: zodResolver(transactionSchema) as any,
     defaultValues: {
       isPaid: true,
       isRecurring: false,
@@ -169,11 +170,14 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
         setOpen(false)
         // Disparar evento personalizado para atualizar a tabela
         window.dispatchEvent(new CustomEvent('transactionAdded'))
+        toast.success('Transação criada com sucesso!')
       } else {
         console.error('Erro ao criar transação:', result.error)
+        toast.error(result.error || 'Erro ao criar transação')
       }
     } catch (error) {
       console.error('Erro ao adicionar transação:', error)
+      toast.error('Erro ao criar transação')
     } finally {
       setIsLoading(false)
     }
@@ -507,7 +511,7 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
       <CreateCategoryDialog
         open={showCreateCategory}
         onOpenChange={setShowCreateCategory}
-        type={watchedType}
+        type={watchedType === 'INCOME' || watchedType === 'EXPENSE' ? watchedType as TransactionType : undefined}
         onCategoryCreated={handleCategoryCreated}
       />
     </Dialog>

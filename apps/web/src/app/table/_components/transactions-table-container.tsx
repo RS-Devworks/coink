@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { DataTable } from './data-table'
-import { Transaction, TransactionFilterParams } from '@/@types/transaction'
+import { Transaction, TransactionFilterParams, TransactionType } from '@/@types/transaction'
 import { getTableData } from '@/server/actions/transactions'
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export default function TransactionsTableContainer() {
@@ -104,7 +104,7 @@ export default function TransactionsTableContainer() {
     if (type === 'ALL') {
       setFilters(prev => ({ ...prev, type: undefined, page: 1 }))
     } else {
-      setFilters(prev => ({ ...prev, type: type as 'INCOME' | 'EXPENSE', page: 1 }))
+      setFilters(prev => ({ ...prev, type: type as TransactionType, page: 1 }))
     }
   }
 
