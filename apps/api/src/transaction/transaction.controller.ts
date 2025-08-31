@@ -45,6 +45,16 @@ export class TransactionController {
     return this.transactionService.findAll(req.user.id, filterDto);
   }
 
+  @Get('dashboard')
+  getDashboardData(@Request() req: any) {
+    return this.transactionService.getDashboardData(req.user.id);
+  }
+
+  @Get('table')
+  getTableData(@Request() req: any, @Query() filterDto: TransactionFilterDto) {
+    return this.transactionService.getTableData(req.user.id, filterDto);
+  }
+
   @Get('summary/:year/:month')
   getMonthlySum(
     @Request() req: any,

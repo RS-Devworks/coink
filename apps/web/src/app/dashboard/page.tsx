@@ -2,9 +2,7 @@ import { AppSidebar } from './_components/app-sidebar'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import DashboardStats from './_components/dashboard-stats'
-import RecentTransactions from './_components/recent-transactions'
-import FinancialChart from './_components/financial-chart'
+import DashboardContainer from './_components/dashboard-container'
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
@@ -38,13 +36,7 @@ export default async function DashboardPage() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <DashboardStats />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <FinancialChart />
-            <RecentTransactions />
-          </div>
+          <DashboardContainer />
         </div>
       </SidebarInset>
     </SidebarProvider>

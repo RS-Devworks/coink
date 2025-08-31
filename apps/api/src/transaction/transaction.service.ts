@@ -380,6 +380,193 @@ export class TransactionService {
     return category;
   }
 
+  async getDashboardData(userId: string) {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    
+    // Resumo do mês atual
+    const monthlySum = await this.getMonthlySum(userId, currentYear, currentMonth);
+    
+    // Transações recentes (últimas 5)
+    const recentTransactions = await this.prisma.transaction.findMany({
+      where: { userId },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            icon: true,
+            type: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    });
+
+    // Próximas parcelas vencendo (próximos 30 dias)
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+    const upcomingInstallments = await this.prisma.transaction.findMany({
+      where: {
+        userId,
+        isInstallment: true,
+        isPaid: false,
+        dueDate: {
+          gte: currentDate,
+          lte: thirtyDaysFromNow,
+        },
+      },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            icon: true,
+            type: true,
+          },
+        },
+      },
+      orderBy: { dueDate: 'asc' },
+      take: 10,
+    });
+
+    // Gastos por categoria (mês atual)
+    const categoryExpenses = await this.prisma.transaction.groupBy({
+      by: ['categoryId'],
+      where: {
+        userId,
+        type: 'EXPENSE',
+        isPaid: true,
+        date: {
+          gte: new Date(currentYear, currentMonth - 1, 1),
+          lte: new Date(currentYear, currentMonth, 0, 23, 59, 59),
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    // Buscar nomes das categorias
+    const categoryIds = categoryExpenses.map(exp => exp.categoryId);
+    const categories = await this.prisma.category.findMany({
+      where: { id: { in: categoryIds } },
+      select: { id: true, name: true, color: true, icon: true },
+    });
+
+    const expensesByCategory = categoryExpenses.map(exp => {
+      const category = categories.find(cat => cat.id === exp.categoryId);
+      return {
+        categoryId: exp.categoryId,
+        categoryName: category?.name || 'Unknown',
+        categoryColor: category?.color || '#gray',
+        categoryIcon: category?.icon || 'circle',
+        amount: exp._sum.amount || 0,
+      };
+    }).sort((a, b) => b.amount - a.amount);
+
+    // Estatísticas gerais
+    const totalTransactions = await this.prisma.transaction.count({
+      where: { userId },
+    });
+
+    const pendingInstallments = await this.prisma.transaction.count({
+      where: {
+        userId,
+        isInstallment: true,
+        isPaid: false,
+      },
+    });
+
+    return {
+      monthlySum,
+      recentTransactions,
+      upcomingInstallments,
+      expensesByCategory,
+      stats: {
+        totalTransactions,
+        pendingInstallments,
+        currentMonth: currentMonth,
+        currentYear: currentYear,
+      },
+    };
+  }
+
+  async getTableData(userId: string, filterDto: TransactionFilterDto) {
+    const {
+      type,
+      paymentMethod,
+      categoryId,
+      startDate,
+      endDate,
+      isPaid,
+      isRecurring,
+      isInstallment,
+      page = 1,
+      limit = 20,
+    } = filterDto;
+
+    const skip = (page - 1) * limit;
+    const where: any = { userId };
+
+    // Aplicar filtros
+    if (type) where.type = type;
+    if (paymentMethod) where.paymentMethod = paymentMethod;
+    if (categoryId) where.categoryId = categoryId;
+    if (isPaid !== undefined) where.isPaid = isPaid;
+    if (isRecurring !== undefined) where.isRecurring = isRecurring;
+    if (isInstallment !== undefined) where.isInstallment = isInstallment;
+
+    if (startDate || endDate) {
+      where.date = {};
+      if (startDate) where.date.gte = new Date(startDate);
+      if (endDate) where.date.lte = new Date(endDate);
+    }
+
+    // Buscar transações com paginação
+    const [transactions, total] = await Promise.all([
+      this.prisma.transaction.findMany({
+        where,
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              color: true,
+              icon: true,
+              type: true,
+            },
+          },
+        },
+        orderBy: [
+          { date: 'desc' },
+          { createdAt: 'desc' },
+        ],
+        skip,
+        take: limit,
+      }),
+      this.prisma.transaction.count({ where }),
+    ]);
+
+    return {
+      data: transactions,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1,
+      },
+      filters: filterDto,
+    };
+  }
+
   private calculateAmounts(amount: number, interestRate?: number, taxRate?: number) {
     let originalAmount = amount;
     let finalAmount = amount;

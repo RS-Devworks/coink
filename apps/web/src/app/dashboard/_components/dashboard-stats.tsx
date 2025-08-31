@@ -1,33 +1,68 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, TrendingDown, DollarSign } from "lucide-react"
+import { TrendingUp, TrendingDown, DollarSign, CreditCard, AlertCircle } from "lucide-react"
 
-export default function DashboardStats() {
+interface DashboardStatsProps {
+  income: number
+  expense: number
+  balance: number
+  transactionsCount: number
+  pendingCount: number
+}
+
+export default function DashboardStats({ 
+  income, 
+  expense, 
+  balance, 
+  transactionsCount, 
+  pendingCount 
+}: DashboardStatsProps) {
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value)
+  }
+
   const stats = [
     {
-      title: "Receitas",
-      value: "R$ 5.240,00",
-      description: "+12% em relação ao mês passado",
+      title: "Receitas do Mês",
+      value: formatCurrency(income),
+      description: "Total de entradas",
       icon: TrendingUp,
       trend: "up"
     },
     {
-      title: "Despesas", 
-      value: "R$ 3.180,00",
-      description: "-8% em relação ao mês passado",
+      title: "Despesas do Mês", 
+      value: formatCurrency(expense),
+      description: "Total de saídas",
       icon: TrendingDown,
       trend: "down"
     },
     {
-      title: "Saldo Total",
-      value: "R$ 2.060,00",
-      description: "Saldo disponível atual",
+      title: "Saldo do Mês",
+      value: formatCurrency(balance),
+      description: balance >= 0 ? "Saldo positivo" : "Saldo negativo",
       icon: DollarSign,
+      trend: balance >= 0 ? "up" : "down"
+    },
+    {
+      title: "Total de Transações",
+      value: transactionsCount.toString(),
+      description: "Todas as transações",
+      icon: CreditCard,
       trend: "neutral"
+    },
+    {
+      title: "Parcelas Pendentes",
+      value: pendingCount.toString(),
+      description: "Aguardando pagamento",
+      icon: AlertCircle,
+      trend: pendingCount > 0 ? "warning" : "neutral"
     }
   ]
 
   return (
-    <>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
       {stats.map((stat, index) => (
         <Card key={index}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -36,18 +71,25 @@ export default function DashboardStats() {
             </CardTitle>
             <stat.icon className={`h-4 w-4 ${
               stat.trend === 'up' ? 'text-green-600' : 
-              stat.trend === 'down' ? 'text-red-600' : 
+              stat.trend === 'down' ? 'text-red-600' :
+              stat.trend === 'warning' ? 'text-yellow-600' :
               'text-muted-foreground'
             }`} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
+            <div className={`text-2xl font-bold ${
+              stat.trend === 'up' ? 'text-green-600' :
+              stat.trend === 'down' && stat.title.includes('Saldo') ? 'text-red-600' :
+              ''
+            }`}>
+              {stat.value}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stat.description}
             </p>
           </CardContent>
         </Card>
       ))}
-    </>
+    </div>
   )
 }

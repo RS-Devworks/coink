@@ -2,7 +2,7 @@ import { AppSidebar } from '../dashboard/_components/app-sidebar'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import TransactionsTable from './_components/transactions-table'
+import TransactionsTableContainer from './_components/transactions-table-container'
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
@@ -36,7 +36,7 @@ export default async function TablePage() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <TransactionsTable />
+          <TransactionsTableContainer />
         </div>
       </SidebarInset>
     </SidebarProvider>
