@@ -388,8 +388,8 @@ export class TransactionService {
     // Resumo do mês atual
     const monthlySum = await this.getMonthlySum(userId, currentYear, currentMonth);
     
-    // Transações recentes (últimas 5)
-    const recentTransactions = await this.prisma.transaction.findMany({
+    // Transações recentes (últimas 5, mas deduplicadas por parcelamento)
+    const allRecentTransactions = await this.prisma.transaction.findMany({
       where: { userId },
       include: {
         category: {
@@ -403,8 +403,33 @@ export class TransactionService {
         },
       },
       orderBy: { createdAt: 'desc' },
-      take: 5,
+      take: 20, // Buscar mais para poder deduplicar
     });
+
+    // Deduplicar transações parceladas (mostrar apenas uma por grupo)
+    const seenGroups = new Set();
+    const recentTransactions = [];
+    
+    for (const transaction of allRecentTransactions) {
+      if (transaction.isInstallment && transaction.installmentGroupId) {
+        if (!seenGroups.has(transaction.installmentGroupId)) {
+          seenGroups.add(transaction.installmentGroupId);
+          // Para parcelamentos, vamos mostrar o valor total e indicar que é parcelado
+          recentTransactions.push({
+            ...transaction,
+            description: `${transaction.description} (Parcelado)`,
+            amount: transaction.totalInstallments ? 
+              transaction.amount * transaction.totalInstallments : 
+              transaction.amount,
+            installmentInfo: `${transaction.totalInstallments}x de ${transaction.amount}`
+          });
+        }
+      } else {
+        recentTransactions.push(transaction);
+      }
+      
+      if (recentTransactions.length >= 5) break;
+    }
 
     // Próximas parcelas vencendo (próximos 30 dias)
     const thirtyDaysFromNow = new Date();
@@ -483,17 +508,131 @@ export class TransactionService {
       },
     });
 
+    // Gastos por método de pagamento (mês atual)
+    const expensesByPaymentMethod = await this.prisma.transaction.groupBy({
+      by: ['paymentMethod'],
+      where: {
+        userId,
+        type: 'EXPENSE',
+        isPaid: true,
+        date: {
+          gte: new Date(currentYear, currentMonth - 1, 1),
+          lte: new Date(currentYear, currentMonth, 0, 23, 59, 59),
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    // Receitas por método de pagamento (mês atual)  
+    const incomeByPaymentMethod = await this.prisma.transaction.groupBy({
+      by: ['paymentMethod'],
+      where: {
+        userId,
+        type: 'INCOME',
+        isPaid: true,
+        date: {
+          gte: new Date(currentYear, currentMonth - 1, 1),
+          lte: new Date(currentYear, currentMonth, 0, 23, 59, 59),
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
     return {
       monthlySum,
       recentTransactions,
       upcomingInstallments,
       expensesByCategory,
+      expensesByPaymentMethod: expensesByPaymentMethod.map(item => ({
+        paymentMethod: item.paymentMethod,
+        amount: item._sum.amount || 0,
+      })).sort((a, b) => b.amount - a.amount),
+      incomeByPaymentMethod: incomeByPaymentMethod.map(item => ({
+        paymentMethod: item.paymentMethod,
+        amount: item._sum.amount || 0,
+      })).sort((a, b) => b.amount - a.amount),
+      categoryTrends: await this.getCategoryExpenseTrends(userId),
       stats: {
         totalTransactions,
         pendingInstallments,
         currentMonth: currentMonth,
         currentYear: currentYear,
       },
+    };
+  }
+
+  async getCategoryExpenseTrends(userId: string) {
+    const monthsData = [];
+    const currentDate = new Date();
+    
+    // Últimos 6 meses incluindo o atual
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const monthName = date.toLocaleDateString('pt-BR', { month: 'short' });
+      
+      // Gastos por categoria neste mês
+      const monthlyExpenses = await this.prisma.transaction.groupBy({
+        by: ['categoryId'],
+        where: {
+          userId,
+          type: 'EXPENSE',
+          isPaid: true,
+          date: {
+            gte: new Date(year, month - 1, 1),
+            lte: new Date(year, month, 0, 23, 59, 59),
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+      });
+
+      monthsData.push({
+        month: monthName,
+        year: year,
+        monthNum: month,
+        expenses: monthlyExpenses,
+      });
+    }
+
+    // Buscar todas as categorias que aparecem nos dados
+    const allCategoryIds = new Set();
+    monthsData.forEach(monthData => {
+      monthData.expenses.forEach(expense => {
+        allCategoryIds.add(expense.categoryId);
+      });
+    });
+
+    const categories = await this.prisma.category.findMany({
+      where: { id: { in: Array.from(allCategoryIds) } },
+      select: { id: true, name: true, color: true },
+    });
+
+    // Transformar dados para formato do gráfico
+    const chartData = monthsData.map(monthData => {
+      const monthRow: any = { month: monthData.month };
+      
+      categories.forEach(category => {
+        const expense = monthData.expenses.find(e => e.categoryId === category.id);
+        monthRow[category.name] = expense?._sum.amount || 0;
+      });
+      
+      return monthRow;
+    });
+
+    return {
+      chartData,
+      categories: categories.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        color: cat.color || '#8884d8',
+      })),
     };
   }
 
@@ -504,6 +643,8 @@ export class TransactionService {
       categoryId,
       startDate,
       endDate,
+      month,
+      year,
       isPaid,
       isRecurring,
       isInstallment,
@@ -522,7 +663,35 @@ export class TransactionService {
     if (isRecurring !== undefined) where.isRecurring = isRecurring;
     if (isInstallment !== undefined) where.isInstallment = isInstallment;
 
-    if (startDate || endDate) {
+    // Filtro por mês/ano específico tem prioridade sobre startDate/endDate
+    if (month && year) {
+      // Para transações parceladas, filtrar por dueDate (vencimento)
+      // Para outras transações, filtrar por date
+      where.OR = [
+        {
+          AND: [
+            { isInstallment: false },
+            {
+              date: {
+                gte: new Date(year, month - 1, 1),
+                lt: new Date(year, month, 1),
+              },
+            },
+          ],
+        },
+        {
+          AND: [
+            { isInstallment: true },
+            {
+              dueDate: {
+                gte: new Date(year, month - 1, 1),
+                lt: new Date(year, month, 1),
+              },
+            },
+          ],
+        },
+      ];
+    } else if (startDate || endDate) {
       where.date = {};
       if (startDate) where.date.gte = new Date(startDate);
       if (endDate) where.date.lte = new Date(endDate);
@@ -553,6 +722,26 @@ export class TransactionService {
       this.prisma.transaction.count({ where }),
     ]);
 
+    // Calcular totais
+    const summaryWhere = { ...where };
+    delete summaryWhere.skip;
+    delete summaryWhere.take;
+
+    const [incomeSum, expenseSum] = await Promise.all([
+      this.prisma.transaction.aggregate({
+        where: { ...summaryWhere, type: 'INCOME', isPaid: true },
+        _sum: { amount: true },
+      }),
+      this.prisma.transaction.aggregate({
+        where: { ...summaryWhere, type: 'EXPENSE', isPaid: true },
+        _sum: { amount: true },
+      }),
+    ]);
+
+    const totalIncome = incomeSum._sum.amount || 0;
+    const totalExpense = expenseSum._sum.amount || 0;
+    const balance = totalIncome - totalExpense;
+
     return {
       data: transactions,
       meta: {
@@ -562,6 +751,11 @@ export class TransactionService {
         totalPages: Math.ceil(total / limit),
         hasNextPage: page < Math.ceil(total / limit),
         hasPrevPage: page > 1,
+      },
+      summary: {
+        totalIncome,
+        totalExpense,
+        balance,
       },
       filters: filterDto,
     };

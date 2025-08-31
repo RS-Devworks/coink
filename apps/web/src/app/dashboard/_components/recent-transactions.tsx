@@ -56,6 +56,11 @@ export default function RecentTransactions({ transactions, upcomingInstallments 
                       <Badge variant="secondary" className="text-xs">
                         {transaction.category.name}
                       </Badge>
+                      {(transaction as any).installmentInfo && (
+                        <Badge variant="outline" className="text-xs text-blue-600">
+                          {(transaction as any).installmentInfo}
+                        </Badge>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>

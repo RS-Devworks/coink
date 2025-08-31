@@ -104,6 +104,8 @@ export interface TransactionFilterParams {
   categoryId?: string
   startDate?: string
   endDate?: string
+  month?: number
+  year?: number
   isPaid?: boolean
   isRecurring?: boolean
   isInstallment?: boolean

@@ -184,6 +184,20 @@ export class TransactionFilterDto {
   endDate?: string;
 
   @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(12)
+  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  month?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(2000)
+  @Max(2100)
+  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  year?: number;
+
+  @IsOptional()
   @IsBoolean()
   isPaid?: boolean;
 
@@ -198,12 +212,14 @@ export class TransactionFilterDto {
   @IsOptional()
   @IsInt()
   @Min(1)
+  @Transform(({ value }) => value ? parseInt(value) : 1)
   page?: number = 1;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Max(100)
+  @Transform(({ value }) => value ? parseInt(value) : 20)
   limit?: number = 20;
 }
 

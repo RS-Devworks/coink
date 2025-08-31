@@ -16,11 +16,11 @@ const chartData = [
 const chartConfig = {
   receitas: {
     label: "Receitas",
-    color: "hsl(var(--chart-1))",
+    color: "var(--color-green-600)",
   },
   despesas: {
     label: "Despesas", 
-    color: "hsl(var(--chart-2))",
+    color: "var(--color-red-600)",
   },
 } satisfies ChartConfig
 

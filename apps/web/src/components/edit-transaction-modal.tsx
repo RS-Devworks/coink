@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,14 +12,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, Loader2, PlusCircle, CreditCard } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
+import { CalendarIcon, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { cn } from "@/lib/utils"
-import { TransactionType, PaymentMethod, CreateTransactionRequest, Category } from '@/@types/transaction'
+import { TransactionType, PaymentMethod, CreateTransactionRequest, Category, Transaction } from '@/@types/transaction'
 import CurrencyInput from '@/components/ui/currency-input'
-import CreateCategoryDialog from '@/components/create-category-dialog'
+import { editTransaction } from '@/server/actions/transactions'
+import { toast } from 'sonner'
 
 const transactionSchema = z.object({
   description: z.string().min(1, 'Descrição é obrigatória'),
@@ -32,13 +32,9 @@ const transactionSchema = z.object({
   isPaid: z.boolean().default(true),
   isRecurring: z.boolean().default(false),
   recurringDay: z.number().min(1).max(31).optional(),
-  isInstallment: z.boolean().default(false),
-  totalInstallments: z.number().min(2).max(60).optional(),
-  interestRate: z.number().min(0).max(100).optional(),
 })
 
 type TransactionFormData = z.infer<typeof transactionSchema>
-
 
 const paymentMethodLabels = {
   CASH: 'Dinheiro',
@@ -51,39 +47,43 @@ const paymentMethodLabels = {
   LOAN: 'Empréstimo'
 }
 
-interface AddTransactionModalProps {
-  trigger?: React.ReactNode
+interface EditTransactionModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  transaction: Transaction
+  onTransactionUpdated: () => void
 }
 
-export default function AddTransactionModal({ trigger }: AddTransactionModalProps) {
-  const [open, setOpen] = useState(false)
+export default function EditTransactionModal({ open, onOpenChange, transaction, onTransactionUpdated }: EditTransactionModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [categoriesLoading, setCategoriesLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
-  const [date, setDate] = useState<Date>()
-  const [dueDate, setDueDate] = useState<Date>()
-  const [showCreateCategory, setShowCreateCategory] = useState(false)
+  const [date, setDate] = useState<Date>(new Date(transaction.date))
+  const [dueDate, setDueDate] = useState<Date | undefined>(transaction.dueDate ? new Date(transaction.dueDate) : undefined)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
     setValue,
     watch,
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      isPaid: true,
-      isRecurring: false,
-      isInstallment: false,
+      description: transaction.description,
+      amount: transaction.amount,
+      type: transaction.type as TransactionType,
+      paymentMethod: transaction.paymentMethod as PaymentMethod,
+      categoryId: transaction.categoryId,
+      date: new Date(transaction.date),
+      dueDate: transaction.dueDate ? new Date(transaction.dueDate) : undefined,
+      isPaid: transaction.isPaid,
+      isRecurring: transaction.isRecurring,
+      recurringDay: transaction.recurringDay || undefined,
     }
   })
 
   const watchedType = watch('type')
-  const watchedPaymentMethod = watch('paymentMethod')
-  const watchedIsInstallment = watch('isInstallment')
-  const watchedIsRecurring = watch('isRecurring')
   
   // Buscar categorias da API
   useEffect(() => {
@@ -107,93 +107,52 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
     }
   }, [open])
 
-  const canBeInstallment = ['CREDIT_CARD', 'BOLETO'].includes(watchedPaymentMethod)
-  
   // Filtrar categorias baseado no tipo
   const filteredCategories = categories.filter(cat => 
     cat.type === watchedType
   )
 
-  const handleCategoryCreated = (newCategory: Category) => {
-    setCategories(prev => [...prev, newCategory])
-    setValue('categoryId', newCategory.id)
-  }
-
   const onSubmit = async (data: TransactionFormData) => {
     setIsLoading(true)
     
     try {
-      const { createTransaction } = await import('@/server/actions/transactions')
-      let result
-      
-      if (data.isInstallment && data.totalInstallments) {
-        // Criar transação parcelada via endpoint regular
-        const transactionData: CreateTransactionRequest = {
-          description: data.description,
-          amount: data.amount,
-          type: data.type as TransactionType,
-          paymentMethod: data.paymentMethod as PaymentMethod,
-          categoryId: data.categoryId,
-          date: data.date,
-          dueDate: data.dueDate,
-          isPaid: data.isPaid,
-          isRecurring: data.isRecurring,
-          recurringDay: data.recurringDay,
-          isInstallment: true,
-          totalInstallments: data.totalInstallments,
-          interestRate: data.interestRate
-        }
-        result = await createTransaction(transactionData)
-      } else {
-        // Criar transação simples
-        const transactionData: CreateTransactionRequest = {
-          description: data.description,
-          amount: data.amount,
-          type: data.type as TransactionType,
-          paymentMethod: data.paymentMethod as PaymentMethod,
-          categoryId: data.categoryId,
-          date: data.date,
-          dueDate: data.dueDate,
-          isPaid: data.isPaid,
-          isRecurring: data.isRecurring,
-          recurringDay: data.recurringDay,
-          interestRate: data.interestRate
-        }
-        result = await createTransaction(transactionData)
+      const transactionData: Partial<CreateTransactionRequest> = {
+        description: data.description,
+        amount: data.amount,
+        type: data.type as TransactionType,
+        paymentMethod: data.paymentMethod as PaymentMethod,
+        categoryId: data.categoryId,
+        date: data.date,
+        dueDate: data.dueDate,
+        isPaid: data.isPaid,
+        isRecurring: data.isRecurring,
+        recurringDay: data.recurringDay,
       }
+
+      const result = await editTransaction(transaction.id, transactionData)
       
       if (result.success) {
-        reset()
-        setDate(undefined)
-        setDueDate(undefined)
-        setOpen(false)
-        // Disparar evento personalizado para atualizar a tabela
-        window.dispatchEvent(new CustomEvent('transactionAdded'))
+        toast.success('Transação atualizada com sucesso!')
+        onTransactionUpdated()
+        onOpenChange(false)
       } else {
-        console.error('Erro ao criar transação:', result.error)
+        toast.error(result.error)
       }
     } catch (error) {
-      console.error('Erro ao adicionar transação:', error)
+      console.error('Erro ao editar transação:', error)
+      toast.error('Erro ao editar transação')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Adicionar Transação
-          </Button>
-        )}
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Adicionar Transação</DialogTitle>
+          <DialogTitle>Editar Transação</DialogTitle>
           <DialogDescription>
-            Registre uma nova receita ou despesa para acompanhar suas finanças
+            Edite os dados da transação
           </DialogDescription>
         </DialogHeader>
         
@@ -217,6 +176,7 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
               <CurrencyInput
                 id="amount"
                 placeholder="R$ 0,00"
+                value={transaction.amount}
                 onChange={(value) => setValue('amount', value)}
                 disabled={isLoading}
               />
@@ -227,7 +187,11 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
 
             <div className="space-y-2">
               <Label>Tipo*</Label>
-              <Select onValueChange={(value) => setValue('type', value as TransactionType)} disabled={isLoading}>
+              <Select 
+                defaultValue={transaction.type}
+                onValueChange={(value) => setValue('type', value as TransactionType)} 
+                disabled={isLoading}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar tipo" />
                 </SelectTrigger>
@@ -244,17 +208,18 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
 
           <div className="space-y-2">
             <Label>Método de Pagamento*</Label>
-            <Select onValueChange={(value) => setValue('paymentMethod', value as PaymentMethod)} disabled={isLoading}>
+            <Select 
+              defaultValue={transaction.paymentMethod}
+              onValueChange={(value) => setValue('paymentMethod', value as PaymentMethod)} 
+              disabled={isLoading}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Selecionar método" />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(paymentMethodLabels).map(([value, label]) => (
                   <SelectItem key={value} value={value}>
-                    <div className="flex items-center gap-2">
-                      {value === 'CREDIT_CARD' && <CreditCard className="h-4 w-4" />}
-                      {label}
-                    </div>
+                    {label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -266,13 +231,11 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
 
           <div className="space-y-2">
             <Label>Categoria*</Label>
-            <Select onValueChange={(value) => {
-              if (value === 'CREATE_NEW') {
-                setShowCreateCategory(true)
-              } else {
-                setValue('categoryId', value)
-              }
-            }} disabled={isLoading || categoriesLoading}>
+            <Select 
+              defaultValue={transaction.categoryId}
+              onValueChange={(value) => setValue('categoryId', value)} 
+              disabled={isLoading || categoriesLoading}
+            >
               <SelectTrigger>
                 <SelectValue placeholder={
                   categoriesLoading ? "Carregando..." : 
@@ -282,17 +245,6 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
                 } />
               </SelectTrigger>
               <SelectContent>
-                {watchedType && (
-                  <>
-                    <SelectItem value="CREATE_NEW">
-                      <div className="flex items-center gap-2 text-blue-600">
-                        <PlusCircle className="w-3 h-3" />
-                        Criar Nova Categoria
-                      </div>
-                    </SelectItem>
-                    {filteredCategories.length > 0 && <div className="border-t my-1" />}
-                  </>
-                )}
                 {filteredCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     <div className="flex items-center gap-2">
@@ -333,7 +285,7 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
                     mode="single"
                     selected={date}
                     onSelect={(selectedDate) => {
-                      setDate(selectedDate)
+                      setDate(selectedDate!)
                       setValue('date', selectedDate!)
                     }}
                     initialFocus
@@ -376,108 +328,11 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
             </div>
           </div>
 
-          {canBeInstallment && (
-            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="installment"
-                  checked={watchedIsInstallment}
-                  onCheckedChange={(checked) => setValue('isInstallment', checked as boolean)}
-                  disabled={isLoading}
-                />
-                <Label htmlFor="installment" className="font-medium">
-                  Parcelar {watchedPaymentMethod === 'CREDIT_CARD' ? 'no cartão' : 'boleto'}
-                </Label>
-              </div>
-
-              {watchedIsInstallment && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="installments">Parcelas*</Label>
-                    <Input
-                      id="installments"
-                      type="number"
-                      min="2"
-                      max="60"
-                      placeholder="12"
-                      {...register('totalInstallments', { valueAsNumber: true })}
-                      disabled={isLoading}
-                    />
-                    {errors.totalInstallments && (
-                      <p className="text-sm text-destructive">{errors.totalInstallments.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="interest">Juros (%)</Label>
-                    <Input
-                      id="interest"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="100"
-                      placeholder="2.5"
-                      {...register('interestRate', { valueAsNumber: true })}
-                      disabled={isLoading}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="recurring"
-                checked={watchedIsRecurring}
-                onCheckedChange={(checked) => setValue('isRecurring', checked as boolean)}
-                disabled={isLoading}
-              />
-              <Label htmlFor="recurring" className="font-medium">
-                Transação Recorrente (ex: Assinaturas)
-              </Label>
-            </div>
-
-            {watchedIsRecurring && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="recurringDay">Dia do mês*</Label>
-                  <Input
-                    id="recurringDay"
-                    type="number"
-                    min="1"
-                    max="31"
-                    placeholder="5"
-                    {...register('recurringDay', { valueAsNumber: true })}
-                    disabled={isLoading}
-                  />
-                  {errors.recurringDay && (
-                    <p className="text-sm text-destructive">{errors.recurringDay.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select onValueChange={(value) => setValue('isPaid', value === 'true')} disabled={isLoading}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecionar status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Pago</SelectItem>
-                      <SelectItem value="false">Pendente</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-          </div>
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
               Cancelar
@@ -485,10 +340,6 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
             <Button 
               type="submit" 
               disabled={isLoading}
-              className={cn(
-                watchedType === 'INCOME' && 'bg-green-600 hover:bg-green-700',
-                watchedType === 'EXPENSE' && 'bg-red-600 hover:bg-red-700'
-              )}
             >
               {isLoading ? (
                 <>
@@ -496,20 +347,12 @@ export default function AddTransactionModal({ trigger }: AddTransactionModalProp
                   Salvando...
                 </>
               ) : (
-                'Salvar Transação'
+                'Salvar Alterações'
               )}
             </Button>
           </div>
         </form>
       </DialogContent>
-      
-      {/* Diálogo para criar nova categoria */}
-      <CreateCategoryDialog
-        open={showCreateCategory}
-        onOpenChange={setShowCreateCategory}
-        type={watchedType}
-        onCategoryCreated={handleCategoryCreated}
-      />
     </Dialog>
   )
 }

@@ -226,6 +226,31 @@ export async function deleteTransaction(id: string) {
   }
 }
 
+export async function editTransaction(id: string, data: Partial<CreateTransactionRequest>) {
+  const session = await getSession()
+  
+  if (!session?.accessToken) {
+    redirect('/login')
+  }
+
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/transactions/${id}`, data, {
+      headers: {
+        'Authorization': `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/json',
+      }
+    })
+
+    return { success: true, data: response.data }
+  } catch (error: any) {
+    console.error('Erro ao editar transação:', error)
+    return {
+      success: false,
+      error: error.response?.data?.message || 'Erro ao editar transação'
+    }
+  }
+}
+
 export async function deleteInstallmentGroup(groupId: string) {
   const session = await getSession()
   

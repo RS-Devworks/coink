@@ -5,6 +5,8 @@ import { getDashboardData } from '@/server/actions/transactions'
 import DashboardStats from './dashboard-stats'
 import RecentTransactions from './recent-transactions'
 import FinancialChart from './financial-chart'
+import PaymentMethodCharts from './payment-method-charts'
+import CategoryTrendsChart from './category-trends-chart'
 import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -146,6 +148,15 @@ export default function DashboardContainer() {
           />
         </div>
       </div>
+
+      {/* Gráficos de métodos de pagamento */}
+      <PaymentMethodCharts
+        expenseData={dashboardData.expensesByPaymentMethod || []}
+        incomeData={dashboardData.incomeByPaymentMethod || []}
+      />
+
+      {/* Gráfico de tendências por categoria */}
+      <CategoryTrendsChart data={dashboardData.categoryTrends || { chartData: [], categories: [] }} />
 
       {/* Gastos por categoria */}
       {dashboardData.expensesByCategory.length > 0 && (
