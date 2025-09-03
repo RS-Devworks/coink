@@ -207,7 +207,7 @@ async function main() {
 
   // Função helper para criar transações de um mês específico
   const createMonthlyTransactions = async (monthIndex: number, year: number = 2024) => {
-    const transactions = [];
+    const transactions: Array<Promise<any>> = [];
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     
@@ -311,7 +311,11 @@ async function main() {
     }
 
     // Alimentação (supermercado + restaurantes)
-    const foodExpenses = [];
+    const foodExpenses: Array<{
+      description: string;
+      amount: number;
+      method: PaymentMethod;
+    }> = [];
     // Supermercado (2-3 vezes por mês)
     for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i++) {
       foodExpenses.push({
@@ -348,7 +352,11 @@ async function main() {
     }
 
     // Transporte (combustível, Uber, etc.)
-    const transportExpenses = [];
+    const transportExpenses: Array<{
+      description: string;
+      amount: number;
+      method: PaymentMethod;
+    }> = [];
     // Combustível (2-4 vezes por mês)
     for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
       transportExpenses.push({
@@ -444,7 +452,7 @@ async function main() {
   };
 
   // Criar transações para os últimos 8 meses + próximos 4 meses (incluindo parcelas futuras)
-  let totalTransactions = [];
+  let totalTransactions: any[] = [];
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
