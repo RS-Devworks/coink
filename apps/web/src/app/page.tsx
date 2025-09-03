@@ -1,5 +1,4 @@
 import Header from "@/components/home/header";
-import Footer from "@/components/home/footer";
 import Hero from "@/components/home/hero";
 import Features from "@/components/home/features";
 import Benefits from "@/components/home/how-it-works";
@@ -18,7 +17,6 @@ export default function Home() {
         <About />
         <Cta />
       </main>
-      <Footer />
     </div>
   );
 }

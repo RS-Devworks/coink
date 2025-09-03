@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, PlusCircle, User2, CreditCard } from "lucide-react"
+import { Home, PlusCircle, User2, CreditCard, PiggyBank } from "lucide-react"
 import AddTransactionModal from '@/components/add-transaction-modal'
 import UserMenu from '@/components/user-menu'
 
@@ -50,8 +50,8 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <DollarSign className="size-4" />
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-pink-400 text-sidebar-primary-foreground">
+                  <PiggyBank className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Coink</span>

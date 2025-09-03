@@ -110,7 +110,7 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
   const incomeTotal = incomeData.reduce((sum, item) => sum + item.amount, 0)
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 h-full">
+    <div className="grid gap-4 md:grid-cols-2">
       {/* Gráfico de Despesas */}
       <Card>
         <CardHeader>

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { DollarSign } from "lucide-react";
+import Logo from "../logo";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { getSession } from "@/lib/auth";
@@ -12,8 +12,7 @@ const Header = () => {
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <DollarSign className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold">Coink</span>
+          <Logo />
         </div>
         <nav className="hidden md:flex items-center space-x-6">
           <Link

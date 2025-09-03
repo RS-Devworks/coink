@@ -195,7 +195,7 @@ export default function DashboardContainer() {
         {/* Segunda metade - Gastos por categoria */}
         <div className="space-y-4 flex flex-col justify-between">
           {/* Gastos por categoria atual */}
-          <Card className="h-80">
+          <Card className="h-[360px] overflow-y-auto">
             <CardHeader>
               <CardTitle>Gastos por Categoria</CardTitle>
             </CardHeader>
