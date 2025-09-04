@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import FinancialChart from './financial-chart'
+import FinancialChart from '../charts/financial-chart'
 
 interface FinancialOverviewProps {
   chartData: Array<{

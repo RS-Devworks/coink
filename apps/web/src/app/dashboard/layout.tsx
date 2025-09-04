@@ -1,5 +1,5 @@
-import { AppSidebar } from './_components/app-sidebar'
-import DashboardHeader from './_components/dashboard-header'
+import { AppSidebar } from './_components/layout/app-sidebar'
+import DashboardHeader from './_components/layout/dashboard-header'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'

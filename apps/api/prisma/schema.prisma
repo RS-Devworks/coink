@@ -18,6 +18,7 @@ model User {
   email      String   @unique
   name       String
   password   String
+  profilePhoto String? // Base64 encoded image
   lastAccess DateTime @default(now())
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -25,6 +26,9 @@ model User {
   // Financial relations
   categories   Category[]
   transactions Transaction[]
+  
+  // Event tracking relations
+  eventLogs    EventLog[]
 }
 
 model Category {
@@ -97,4 +101,35 @@ enum PaymentMethod {
   CHECK
   BOLETO
   LOAN
+}
+
+model EventLog {
+  id            String   @id @default(uuid())
+  type          EventType
+  sessionId     String
+  metadata      String?  // JSON string with event details
+  timestamp     DateTime @default(now())
+  serverTimestamp DateTime @default(now())
+  ip            String?
+  userAgent     String?
+  
+  // Relations
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId, type])
+  @@index([userId, timestamp])
+  @@index([sessionId])
+}
+
+enum EventType {
+  LOGIN
+  LOGOUT
+  PROFILE_UPDATE
+  PHOTO_UPLOAD
+  NAVIGATION
+  ACTION
 }

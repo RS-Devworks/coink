@@ -39,4 +39,8 @@ export type RequestAuthGuard = {
     email: string;
     id: string;
   };
+  headers: {
+    [key: string]: string | string[] | undefined;
+    'user-agent'?: string;
+  };
 };

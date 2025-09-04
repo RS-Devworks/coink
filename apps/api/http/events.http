@@ -1,0 +1,74 @@
+### Fazer login para obter token
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Criar evento único
+POST http://localhost:5000/events
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "type": "LOGIN",
+  "sessionId": "session_123456",
+  "metadata": "{\"success\": true, \"loginMethod\": \"email\"}",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+
+### Criar múltiplos eventos
+POST http://localhost:5000/events/batch
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "events": [
+    {
+      "type": "LOGIN",
+      "sessionId": "session_123456",
+      "metadata": "{\"success\": true, \"loginMethod\": \"email\"}",
+      "timestamp": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "type": "NAVIGATION",
+      "sessionId": "session_123456",
+      "metadata": "{\"path\": \"/dashboard\", \"previousPath\": \"/login\"}",
+      "timestamp": "2024-01-15T10:30:15.000Z"
+    }
+  ]
+}
+
+### Buscar eventos do usuário
+GET http://localhost:5000/events?limit=10&type=LOGIN
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Buscar estatísticas de eventos
+GET http://localhost:5000/events/stats
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Upload de foto do perfil (base64)
+POST http://localhost:5000/upload/profile-photo
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "photoBase64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
+  "fileName": "profile.jpg",
+  "sessionId": "session_123456"
+}
+
+### Buscar foto do perfil
+GET http://localhost:5000/upload/profile-photo
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Deletar foto do perfil
+DELETE http://localhost:5000/upload/profile-photo
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "sessionId": "session_123456"
+}

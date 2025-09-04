@@ -1,6 +1,6 @@
 import { memo } from 'react'
-import CategoryTrendsChart from './category-trends-chart'
-import IncomeTrendsChart from './income-trends-chart'
+import CategoryTrendsChart from '../charts/category-trends-chart'
+import IncomeTrendsChart from '../charts/income-trends-chart'
 
 interface TrendsSectionProps {
   categoryTrends: {

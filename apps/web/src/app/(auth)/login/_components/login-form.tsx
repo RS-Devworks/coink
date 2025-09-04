@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useEventLogger } from '@/lib/event-system'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,6 +24,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const eventLogger = useEventLogger()
 
   const {
     register,
@@ -36,6 +38,8 @@ export default function LoginForm() {
     setIsLoading(true)
     setError(null)
 
+    const loginStartTime = Date.now()
+
     try {
       const { signIn } = await import('next-auth/react')
       const result = await signIn('credentials', {
@@ -45,11 +49,47 @@ export default function LoginForm() {
       })
 
       if (result?.error) {
+        // Log evento de login falho
+        await eventLogger.logLogin({
+          loginMethod: 'email',
+          success: false,
+          errorMessage: 'Credenciais inválidas',
+          metadata: {
+            email: data.email,
+            duration: Date.now() - loginStartTime,
+            errorType: 'invalid_credentials'
+          }
+        })
         setError('Credenciais inválidas. Verifique seu email e senha.')
       } else if (result?.ok) {
+        // Log evento de login bem-sucedido
+        await eventLogger.logLogin({
+          loginMethod: 'email',
+          success: true,
+          metadata: {
+            email: data.email,
+            duration: Date.now() - loginStartTime
+          }
+        })
+        
+        // Log navegação para dashboard
+        await eventLogger.logNavigation('/dashboard', '/login')
+        
         window.location.href = '/dashboard'
       }
     } catch (err) {
+      // Log erro geral
+      await eventLogger.logLogin({
+        loginMethod: 'email',
+        success: false,
+        errorMessage: 'Erro interno',
+        metadata: {
+          email: data.email,
+          duration: Date.now() - loginStartTime,
+          errorType: 'internal_error',
+          error: err instanceof Error ? err.message : 'Erro desconhecido'
+        }
+      })
       setError('Erro ao fazer login. Tente novamente.')
     } finally {
       setIsLoading(false)

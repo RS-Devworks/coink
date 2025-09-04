@@ -5,15 +5,21 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { EventsModule } from './events/events.module';
+import { UploadModule } from './upload/upload.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
+    PrismaModule,
     UserModule,
     AuthModule,
     CategoryModule,
     TransactionModule,
+    EventsModule,
+    UploadModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,

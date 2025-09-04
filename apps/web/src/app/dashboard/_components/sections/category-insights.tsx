@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import PaymentMethodCharts from './payment-method-charts'
+import PaymentMethodCharts from '../charts/payment-method-charts'
 
 interface CategoryInsightsProps {
   expensesByCategory: Array<{
