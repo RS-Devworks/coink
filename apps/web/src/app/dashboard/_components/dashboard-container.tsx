@@ -3,11 +3,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardData } from '@/server/actions/transactions'
 import DashboardStats from './dashboard-stats'
-import RecentTransactions from './recent-transactions'
-import FinancialChart from './financial-chart'
-import PaymentMethodCharts from './payment-method-charts'
-import CategoryTrendsChart from './category-trends-chart'
-import IncomeTrendsChart from './income-trends-chart'
+import FinancialOverview from './financial-overview'
+import CategoryInsights from './category-insights'
+import TrendsSection from './trends-section'
 import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -137,123 +135,25 @@ export default function DashboardContainer() {
         pendingCount={statsData.pendingInstallments}
       />
 
-      {/* Seção de visão financeira reorganizada */}
+      {/* Seção de visão financeira */}
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Primeira metade - Gráfico + Transações Recentes */}
-        <div className="space-y-4">
-          <FinancialChart data={chartData} />
-          
-          {/* Transações recentes com scroll */}
-          <Card className="h-80">
-            <CardHeader>
-              <CardTitle>Transações Recentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 overflow-y-auto max-h-60 pr-2">
-                {dashboardData.recentTransactions.slice(0, 10).map((transaction: {
-                  id: string;
-                  description: string;
-                  amount: number;
-                  type: 'INCOME' | 'EXPENSE';
-                  category?: {
-                    name: string;
-                    color: string;
-                  };
-                }) => (
-                  <div key={transaction.id} className="flex items-center justify-between py-2 border-b border-border/40">
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: transaction.category?.color || '#gray' }}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium truncate">{transaction.description}</p>
-                        <p className="text-sm text-muted-foreground">{transaction.category?.name}</p>
-                      </div>
-                    </div>
-                    <span className={`font-semibold whitespace-nowrap ${
-                      transaction.type === 'INCOME' ? 'text-income' : 'text-expense'
-                    }`}>
-                      {transaction.type === 'INCOME' ? '+' : '-'}
-                      {new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      }).format(transaction.amount)}
-                    </span>
-                  </div>
-                ))}
-                {dashboardData.recentTransactions.length === 0 && (
-                  <div className="text-center text-muted-foreground py-8">
-                    Nenhuma transação recente
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Segunda metade - Gastos por categoria */}
-        <div className="space-y-4 flex flex-col justify-between">
-          {/* Gastos por categoria atual */}
-          <Card className="h-[360px] overflow-y-auto">
-            <CardHeader>
-              <CardTitle>Gastos por Categoria</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4 overflow-y-auto h-auto pr-2">
-                {dashboardData.expensesByCategory.length > 0 ? (
-                  dashboardData.expensesByCategory.map((category: {
-                    categoryId: string;
-                    categoryColor: string;
-                    categoryName: string;
-                    amount: number;
-                  }) => (
-                    <div key={category.categoryId} className="flex items-center justify-between py-2">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-4 h-4 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: category.categoryColor }}
-                        />
-                        <span className="font-medium">{category.categoryName}</span>
-                      </div>
-                      <span className="text-lg font-semibold text-expense whitespace-nowrap">
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL'
-                        }).format(category.amount)}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center text-muted-foreground py-8">
-                    Nenhuma despesa este mês
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Gráficos de métodos de pagamento */}
-          <PaymentMethodCharts
-            expenseData={dashboardData.expensesByPaymentMethod || []}
-            incomeData={dashboardData.incomeByPaymentMethod || []}
-          />
-        </div>
-      </div>
-
-      {/* Seção de tendências - lado a lado */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Tendências de Despesas */}
-        <CategoryTrendsChart 
-          data={dashboardData.categoryTrends || { chartData: [], categories: [] }} 
+        <FinancialOverview
+          chartData={chartData}
+          recentTransactions={dashboardData.recentTransactions}
         />
-        
-        {/* Tendências de Receitas */}
-        <IncomeTrendsChart 
-          data={dashboardData.incomeTrends || { chartData: [], categories: [] }} 
-          title="Tendências de Receitas por Categoria"
+
+        <CategoryInsights
+          expensesByCategory={dashboardData.expensesByCategory}
+          expensesByPaymentMethod={dashboardData.expensesByPaymentMethod || []}
+          incomeByPaymentMethod={dashboardData.incomeByPaymentMethod || []}
         />
       </div>
+
+      {/* Seção de tendências */}
+      <TrendsSection
+        categoryTrends={dashboardData.categoryTrends || { chartData: [], categories: [] }}
+        incomeTrends={dashboardData.incomeTrends || { chartData: [], categories: [] }}
+      />
     </div>
   )
 }

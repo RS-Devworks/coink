@@ -32,7 +32,7 @@ export default function RecentTransactions({ transactions, upcomingInstallments 
               </CardDescription>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="/table">
+              <Link href="/dashboard/transactions">
                 Ver todas
                 <ArrowUpRight className="h-4 w-4" />
               </Link>

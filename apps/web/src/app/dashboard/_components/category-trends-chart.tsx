@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, Legend } from "recharts"
@@ -54,7 +55,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   return null
 }
 
-export default function CategoryTrendsChart({ data }: CategoryTrendsChartProps) {
+const CategoryTrendsChart = memo(function CategoryTrendsChart({ data }: CategoryTrendsChartProps) {
   if (!data.chartData.length || !data.categories.length) {
     return (
       <Card>
@@ -174,4 +175,6 @@ export default function CategoryTrendsChart({ data }: CategoryTrendsChartProps) 
       </CardContent>
     </Card>
   )
-}
+})
+
+export default CategoryTrendsChart

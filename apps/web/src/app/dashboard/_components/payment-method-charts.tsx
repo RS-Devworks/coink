@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { Cell, Pie, PieChart, Legend } from "recharts"
@@ -99,7 +100,7 @@ const createChartConfig = (data: Array<{
   return config
 }
 
-export default function PaymentMethodCharts({ expenseData, incomeData }: PaymentMethodChartsProps) {
+const PaymentMethodCharts = memo(function PaymentMethodCharts({ expenseData, incomeData }: PaymentMethodChartsProps) {
   const expenseChartData = prepareChartData(expenseData)
   const incomeChartData = prepareChartData(incomeData)
   
@@ -212,4 +213,6 @@ export default function PaymentMethodCharts({ expenseData, incomeData }: Payment
       </Card>
     </div>
   )
-}
+})
+
+export default PaymentMethodCharts

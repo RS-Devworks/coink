@@ -29,14 +29,14 @@ const data = {
     },
     {
       title: "Transações",
-      url: "/table",
+      url: "/dashboard/transactions",
       icon: CreditCard,
     },
   ],
   navSecondary: [
     {
       title: "Perfil",
-      url: "/profile",
+      url: "/dashboard/profile",
       icon: User2,
     },
   ],
