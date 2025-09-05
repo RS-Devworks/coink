@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {useRouter} from 'next/router'
 import { toast } from 'sonner'
-import { getUserProfile, updateUserProfile, updateUserPassword, deleteUserAccount } from '@/server/actions/user'
+import { getUserProfile, updateUserProfile, updateUserPassword, deleteUserAccount } from '@/server/actions/profile'
 import ProfileHeader from './profile-header'
 import ProfileTabs from './profile-tabs'
 import { motion } from 'framer-motion'
@@ -17,6 +16,7 @@ interface UserProfile {
   createdAt: string
   updatedAt: string
   lastAccess: string | null
+  profilePhoto?: string | null
 }
 
 function ProfileSkeleton() {

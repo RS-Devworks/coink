@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +10,7 @@ import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Camera, Edit3, MapPin, Calendar } from 'lucide-react'
 import PhotoUpload from './photo-upload'
+import EditProfileDialog from './edit-profile-dialog'
 
 interface UserProfile {
   id: string
@@ -17,6 +19,7 @@ interface UserProfile {
   createdAt: string
   updatedAt: string
   lastAccess: string | null
+  profilePhoto?: string | null
 }
 
 interface ProfileHeaderProps {
@@ -24,12 +27,22 @@ interface ProfileHeaderProps {
 }
 
 export default function ProfileHeader({ profile }: ProfileHeaderProps) {
-  const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | undefined>(undefined)
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false)
+  const queryClient = useQueryClient()
+  
   const memberSince = new Date(profile.createdAt).toLocaleDateString('pt-BR', {
     year: 'numeric',
     month: 'long'
   })
+
+  const handlePhotoUploaded = (url: string) => {
+    // Atualizar o cache do perfil com a nova foto
+    queryClient.setQueryData(['user-profile'], (oldData: any) => ({
+      ...oldData,
+      profilePhoto: url
+    }))
+    setIsPhotoDialogOpen(false)
+  }
 
   return (
     <motion.div
@@ -54,7 +67,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
                 <Avatar className="w-24 h-24 border-4 border-background shadow-xl">
-                  <AvatarImage src={currentPhotoUrl} alt={profile.name} />
+                  <AvatarImage src={profile.profilePhoto || undefined} alt={profile.name} />
                   <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-pink-400 to-purple-500 text-white">
                     {profile.name?.charAt(0).toUpperCase()}
                   </AvatarFallback>
@@ -77,12 +90,9 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
                     <DialogTitle>Alterar Foto do Perfil</DialogTitle>
                   </DialogHeader>
                   <PhotoUpload
-                    currentPhotoUrl={currentPhotoUrl}
+                    currentPhotoUrl={profile.profilePhoto || undefined}
                     userName={profile.name}
-                    onPhotoUploaded={(url) => {
-                      setCurrentPhotoUrl(url)
-                      setIsPhotoDialogOpen(false)
-                    }}
+                    onPhotoUploaded={handlePhotoUploaded}
                   />
                 </DialogContent>
               </Dialog>
@@ -125,15 +135,17 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
             </div>
 
             {/* Action Button */}
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg">
-                <Edit3 className="w-4 h-4 mr-2" />
-                Editar Perfil
-              </Button>
-            </motion.div>
+            <EditProfileDialog profile={profile}>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg">
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Editar Perfil
+                </Button>
+              </motion.div>
+            </EditProfileDialog>
           </div>
         </div>
       </Card>

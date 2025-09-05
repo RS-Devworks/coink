@@ -8,8 +8,7 @@ import { Progress } from '@/components/ui/progress'
 import { Card, CardContent } from '@/components/ui/card'
 import { Camera, Upload, X, Check } from 'lucide-react'
 import { toast } from 'sonner'
-import { uploadUserPhoto } from '@/server/actions/upload'
-import { useEventLogger } from '@/lib/event-system'
+import { uploadUserPhoto } from '@/server/actions/profile'
 
 interface PhotoUploadProps {
   currentPhotoUrl?: string
@@ -27,7 +26,6 @@ export default function PhotoUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const eventLogger = useEventLogger()
 
   const handleFileSelect = (file: File) => {
     if (!file) return
@@ -81,42 +79,18 @@ export default function PhotoUpload({
         reader.readAsDataURL(file)
       })
 
-      // Enviar para API NestJS
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-      const { getSession } = await import('next-auth/react')
-      const session = await getSession()
-
-      const response = await fetch(`${API_BASE_URL}/upload/profile-photo`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.accessToken}`
-        },
-        body: JSON.stringify({
-          photoBase64: base64,
-          fileName: file.name,
-          sessionId: eventLogger.getQueueStatus().sessionId
-        })
-      })
+      // Enviar via server action
+      const result = await uploadUserPhoto(base64, file.name)
 
       clearInterval(progressInterval)
       setUploadProgress(100)
 
-      const result = await response.json()
-
-      if (response.ok && result.success) {
+      if (result.success) {
         toast.success('Foto enviada com sucesso!')
         onPhotoUploaded?.(base64) // Usar base64 como URL
         setPreviewUrl(null)
-
-        // Log do evento
-        await eventLogger.logAction('photo_upload_success', {
-          fileName: file.name,
-          fileSize: file.size,
-          fileType: file.type
-        })
       } else {
-        throw new Error(result.message || 'Erro ao enviar foto')
+        throw new Error(result.error || 'Erro ao enviar foto')
       }
 
     } catch (error) {
@@ -124,13 +98,6 @@ export default function PhotoUpload({
       toast.error(error instanceof Error ? error.message : 'Erro ao enviar foto')
       setPreviewUrl(null)
 
-      // Log do erro
-      await eventLogger.logAction('photo_upload_error', {
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        error: error instanceof Error ? error.message : 'Erro desconhecido'
-      })
     } finally {
       setIsUploading(false)
       setUploadProgress(0)

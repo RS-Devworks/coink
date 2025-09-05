@@ -8,8 +8,19 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { RefreshCw, Activity, Eye, EyeOff } from 'lucide-react'
-import { getUserEvents, getUserEventStats } from '@/server/actions/events'
-import { EventData } from '@/lib/event-system'
+import { getUserEvents, getUserEventStats } from '@/server/actions/profile'
+
+// Interface para eventos (mantida para compatibilidade com a API)
+interface EventData {
+  id: string
+  type: string
+  sessionId: string
+  metadata: string
+  timestamp: string
+  serverTimestamp: string
+  ip?: string
+  userAgent?: string
+}
 
 interface EventLogsProps {
   className?: string
@@ -24,31 +35,21 @@ export default function EventLogs({ className }: EventLogsProps) {
   const loadEvents = async () => {
     setIsLoading(true)
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-      const { getSession } = await import('next-auth/react')
-      const session = await getSession()
-
-      const [eventsResponse, statsResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/events?limit=50`, {
-          headers: {
-            'Authorization': `Bearer ${session?.accessToken}`
-          }
-        }),
-        fetch(`${API_BASE_URL}/events/stats`, {
-          headers: {
-            'Authorization': `Bearer ${session?.accessToken}`
-          }
-        })
+      const [eventsResult, statsResult] = await Promise.all([
+        getUserEvents(50),
+        getUserEventStats()
       ])
 
-      if (eventsResponse.ok) {
-        const eventsData = await eventsResponse.json()
-        setEvents(eventsData.events || [])
+      if (eventsResult.success) {
+        setEvents(eventsResult.data?.events || [])
+      } else {
+        console.error('❌ Erro ao carregar eventos:', eventsResult.error)
       }
 
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json()
-        setStats(statsData)
+      if (statsResult.success) {
+        setStats(statsResult.data)
+      } else {
+        console.error('❌ Erro ao carregar estatísticas:', statsResult.error)
       }
     } catch (error) {
       console.error('❌ Erro ao carregar eventos:', error)
@@ -187,59 +188,101 @@ export default function EventLogs({ className }: EventLogsProps) {
                       
                       {event.metadata && (
                         <div className="text-sm">
-                          {event.type === 'login' && (
-                            <div>
-                              <span className="font-medium">
-                                Login {event.metadata.success ? 'bem-sucedido' : 'falhou'}
-                              </span>
-                              {event.metadata.email && (
-                                <span className="text-muted-foreground ml-2">
-                                  ({event.metadata.email})
-                                </span>
-                              )}
-                              {event.metadata.duration && (
-                                <span className="text-muted-foreground ml-2">
-                                  {event.metadata.duration}ms
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          
-                          {event.type === 'photo_upload' && (
-                            <div>
-                              <span className="font-medium">
-                                Upload de foto {event.metadata.success ? 'bem-sucedido' : 'falhou'}
-                              </span>
-                              {event.metadata.fileName && (
-                                <span className="text-muted-foreground ml-2">
-                                  {event.metadata.fileName}
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          
-                          {event.type === 'navigation' && (
-                            <div>
-                              <span className="font-medium">Navegação:</span>
-                              <span className="text-muted-foreground ml-2">
-                                {event.metadata.previousPath || '/'} → {event.metadata.path}
-                              </span>
-                            </div>
-                          )}
-                          
-                          {event.type === 'action' && (
-                            <div>
-                              <span className="font-medium">Ação:</span>
-                              <span className="text-muted-foreground ml-2">
-                                {event.metadata.action}
-                              </span>
-                              {event.metadata.page && (
-                                <span className="text-muted-foreground ml-2">
-                                  em {event.metadata.page}
-                                </span>
-                              )}
-                            </div>
-                          )}
+                          {(() => {
+                            try {
+                              const metadata = JSON.parse(event.metadata)
+                              
+                              if (event.type === 'LOGIN') {
+                                return (
+                                  <div>
+                                    <span className="font-medium">
+                                      Login {metadata.success ? 'bem-sucedido' : 'falhou'}
+                                    </span>
+                                    {metadata.loginMethod && (
+                                      <span className="text-muted-foreground ml-2">
+                                        ({metadata.loginMethod})
+                                      </span>
+                                    )}
+                                    {metadata.errorMessage && (
+                                      <span className="text-destructive ml-2">
+                                        - {metadata.errorMessage}
+                                      </span>
+                                    )}
+                                  </div>
+                                )
+                              }
+                              
+                              if (event.type === 'PHOTO_UPLOAD') {
+                                return (
+                                  <div>
+                                    <span className="font-medium">
+                                      Upload de foto {metadata.success ? 'bem-sucedido' : 'falhou'}
+                                    </span>
+                                    {metadata.fileName && (
+                                      <span className="text-muted-foreground ml-2">
+                                        {metadata.fileName}
+                                      </span>
+                                    )}
+                                    {metadata.errorMessage && (
+                                      <span className="text-destructive ml-2">
+                                        - {metadata.errorMessage}
+                                      </span>
+                                    )}
+                                  </div>
+                                )
+                              }
+                              
+                              if (event.type === 'PROFILE_UPDATE') {
+                                return (
+                                  <div>
+                                    <span className="font-medium">Perfil atualizado:</span>
+                                    <span className="text-muted-foreground ml-2">
+                                      {metadata.action || 'dados alterados'}
+                                    </span>
+                                    {metadata.changes && (
+                                      <span className="text-muted-foreground ml-2">
+                                        ({metadata.changes.join(', ')})
+                                      </span>
+                                    )}
+                                  </div>
+                                )
+                              }
+                              
+                              if (event.type === 'ACTION') {
+                                return (
+                                  <div>
+                                    <span className="font-medium">Ação:</span>
+                                    <span className="text-muted-foreground ml-2">
+                                      {metadata.action}
+                                    </span>
+                                    {metadata.transactionId && (
+                                      <span className="text-muted-foreground ml-2">
+                                        (ID: {metadata.transactionId.slice(0, 8)}...)
+                                      </span>
+                                    )}
+                                  </div>
+                                )
+                              }
+                              
+                              return (
+                                <div>
+                                  <span className="font-medium">Evento:</span>
+                                  <span className="text-muted-foreground ml-2">
+                                    {event.type.toLowerCase()}
+                                  </span>
+                                </div>
+                              )
+                            } catch {
+                              return (
+                                <div>
+                                  <span className="font-medium">Evento:</span>
+                                  <span className="text-muted-foreground ml-2">
+                                    {event.type.toLowerCase()}
+                                  </span>
+                                </div>
+                              )
+                            }
+                          })()}
                         </div>
                       )}
                       

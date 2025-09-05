@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { UploadPhotoDto, DeletePhotoDto } from './dto/upload.dto';
+import { UserPhotoUpdatedEvent } from '../events/interfaces/event.interfaces';
 
 @Injectable()
 export class UploadService {
@@ -82,19 +83,21 @@ export class UploadService {
         },
       });
 
-      // Log do evento de sucesso
-      await this.eventsService.logPhotoUploadEvent(
+      // Emitir evento de sucesso
+      this.eventsService.emitUserPhotoUpdated({
         userId,
-        sessionId,
-        true,
-        {
-          fileName: uploadPhotoDto.fileName || 'profile_photo',
+        previousPhoto: null, // TODO: buscar foto anterior
+        newPhoto: uploadPhotoDto.photoBase64,
+        fileName: uploadPhotoDto.fileName || 'profile_photo',
+        fileSize: estimatedSize,
+        success: true,
+        metadata: {
           mimeType,
           estimatedSize,
         },
         ip,
         userAgent,
-      );
+      });
 
       this.logger.log(`Profile photo updated for user ${userId}`);
 
@@ -109,18 +112,20 @@ export class UploadService {
         throw error;
       }
 
-      // Log do erro
-      await this.eventsService.logPhotoUploadEvent(
+      // Emitir evento de erro
+      this.eventsService.emitUserPhotoUpdated({
         userId,
-        sessionId,
-        false,
-        {
+        previousPhoto: null,
+        newPhoto: '',
+        fileName: uploadPhotoDto.fileName,
+        success: false,
+        errorMessage: error.message,
+        metadata: {
           error: error.message,
-          fileName: uploadPhotoDto.fileName,
         },
         ip,
         userAgent,
-      );
+      });
 
       this.logger.error(`Failed to upload photo for user ${userId}: ${error.message}`);
       throw new BadRequestException('Erro interno do servidor');

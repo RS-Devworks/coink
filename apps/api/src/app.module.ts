@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { EventsModule } from './events/events.module';
+import { EventEmitterModule } from './events/event-emitter.module';
 import { UploadModule } from './upload/upload.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
@@ -14,6 +15,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 @Module({
   imports: [
     PrismaModule,
+    EventEmitterModule,
     UserModule,
     AuthModule,
     CategoryModule,

@@ -10,6 +10,7 @@ import {
   HttpCode,
   UseGuards,
   Request,
+  Ip,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -72,8 +73,9 @@ export class UserController {
 
   @Patch('profile/me')
   @UseGuards(AuthGuard)
-  async updateProfile(@Request() req: any, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(req.user.id, updateUserDto);
+  async updateProfile(@Request() req: any, @Body() updateUserDto: UpdateUserDto, @Ip() ip: string) {
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    return this.userService.update(req.user.id, updateUserDto, ip, userAgent);
   }
 
   @Patch('profile/me/password')
@@ -81,8 +83,10 @@ export class UserController {
   async updateProfilePassword(
     @Request() req: any,
     @Body() updatePasswordDto: UpdateUserPasswordDto,
+    @Ip() ip: string,
   ) {
-    return this.userService.updatePassword(req.user.id, updatePasswordDto);
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    return this.userService.updatePassword(req.user.id, updatePasswordDto, ip, userAgent);
   }
 
   @Delete('profile/me')

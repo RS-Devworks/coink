@@ -22,6 +22,7 @@ interface UserProfile {
   createdAt: string
   updatedAt: string
   lastAccess: string | null
+  profilePhoto?: string | null
 }
 
 interface ProfileTabsProps {
@@ -84,12 +85,6 @@ export default function ProfileTabs({
     })
   }
 
-  const recentActivities = [
-    { action: 'Login realizado', date: '2024-01-15 14:30', location: 'São Paulo, BR' },
-    { action: 'Perfil atualizado', date: '2024-01-14 09:15', location: 'São Paulo, BR' },
-    { action: 'Senha alterada', date: '2024-01-10 16:45', location: 'São Paulo, BR' },
-    { action: 'Nova transação', date: '2024-01-09 11:20', location: 'São Paulo, BR' },
-  ]
 
   return (
     <motion.div
@@ -437,36 +432,6 @@ export default function ProfileTabs({
             >
               {/* Logs de eventos em tempo real */}
               <EventLogs />
-              
-              {/* Atividades simuladas para demonstração */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="w-5 h-5" />
-                    Atividade Recente (Simulada)
-                  </CardTitle>
-                  <CardDescription>
-                    Histórico das suas ações na plataforma
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentActivities.map((activity, index) => (
-                      <div key={index} className="flex items-start gap-4 p-4 border rounded-lg">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                        <div className="flex-1 space-y-1">
-                          <p className="font-medium">{activity.action}</p>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>{activity.date}</span>
-                            <span>•</span>
-                            <span>{activity.location}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             </motion.div>
           </TabsContent>
         </AnimatePresence>
