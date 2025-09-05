@@ -93,11 +93,26 @@ EventType [icon: activity, color: red] {
 }
 
 // Relationships
+// Um usuário pode ter muitas categorias (1:N)
 User.id < Category.userId
+
+// Um usuário pode ter muitas transações (1:N)
 User.id < Transaction.userId
+
+// Um usuário pode gerar muitos logs de eventos (1:N)
 User.id < EventLog.userId
+
+// Uma categoria pode ter muitas transações (1:N)
 Category.id < Transaction.categoryId
+
+// Um tipo de transação define o tipo da categoria (1:1)
 TransactionType - Category.type
+
+// Um tipo de transação define o tipo da transação (1:1)
 TransactionType - Transaction.type
+
+// Um método de pagamento define o método da transação (1:1)
 PaymentMethod - Transaction.paymentMethod
+
+// Um tipo de evento define o tipo do log (1:1)
 EventType - EventLog.type

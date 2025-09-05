@@ -4,34 +4,31 @@ title Coink - Arquitetura do Sistema de Gestão Financeira
 // Infraestrutura principal
 Development [icon: code] {
   Turborepo [icon: package, label: "Turborepo Monorepo"]
-  Docker [icon: docker] {
-    WebApp [icon: nextdotjs, label: "Next.js 15.5.0 Frontend"]
-    API [icon: nest, label: "NestJS Backend API"]
-    Database [icon: sqlite, label: "SQLite Database"]
+  
+  // Aplicações principais
+  WebApp [icon: nextdotjs, label: "Next.js 15.5.0 Frontend"]
+  API [icon: nest, label: "NestJS Backend API"]
+  Database [icon: sqlite, label: "SQLite Database"]
 
-    // Componentes internos do Backend
-    BackendStack [icon: nestjs, label: "Backend Stack"] {
-      Prisma [icon: prisma, label: "Prisma ORM"]
-      AuthJWT [icon: lock, label: "Autenticação JWT"]
-      Bcrypt [icon: shield, label: "Hash de Senhas"]
-      Events [icon: activity-square, label: "Log de Eventos"]
-    }
-    
-    // Componentes internos do Frontend
-    UIStack [icon: nextdotjs, label: "Frontend Stack"] {
-      React [icon: react, label: "React 19"]
-      TailwindCSS [icon: tailwind-css, label: "TailwindCSS v4"]
-      ServerActions [icon: server, label: "Next.js Server Actions"]
-      ContextAPI [icon: context, label: "React Context"]
-    }
+  // Componentes internos do Backend
+  BackendStack [icon: nestjs, label: "Backend Stack"] {
+    Prisma [icon: prisma, label: "Prisma ORM"]
+    AuthJWT [icon: lock, label: "Autenticação JWT"]
+    Bcrypt [icon: shield, label: "Hash de Senhas"]
+    Events [icon: activity-square, label: "Log de Eventos"]
+  }
+  
+  // Componentes internos do Frontend
+  UIStack [icon: nextdotjs, label: "Frontend Stack"] {
+    React [icon: react, label: "React 19"]
+    TailwindCSS [icon: tailwind-css, label: "TailwindCSS v4"]
+    ServerActions [icon: server, label: "Next.js Server Actions"]
+    ContextAPI [icon: context, label: "React Context"]
   }
 }
 
-// Serviços externos
-ExternalServices {
-  EmailProvider [icon: mail, label: "Email Provider\n(Recuperação de Senha)"]
-  FileStorage [icon: folder, label: "Armazenamento\n(Profile Photos)"]
-}
+// Armazenamento local
+LocalStorage [icon: folder, label: "Armazenamento Local\n(Profile Photos - Base64)"]
 
 // Ferramentas de desenvolvimento
 DevTools {
@@ -41,10 +38,9 @@ DevTools {
 }
 
 // Conexões de infraestrutura
-Turborepo > Docker: orquestração do monorepo
-Docker > WebApp: container frontend
-Docker > API: container backend
-Docker > Database: container database
+Turborepo > WebApp: orquestração do monorepo
+Turborepo > API: orquestração do monorepo
+Turborepo > Database: orquestração do monorepo
 
 // Roteamento interno
 WebApp > API: chamadas autenticadas para API
@@ -60,9 +56,8 @@ API > Events: log de eventos do sistema
 WebApp > UIStack: componentes React
 UIStack > ServerActions: server actions Next.js
 
-// Serviços externos
-API > EmailProvider: envio de emails
-API > FileStorage: armazenamento de arquivos
+// Armazenamento
+API > LocalStorage: armazenamento de arquivos (Base64)
 
 // Ferramentas de desenvolvimento
 DevTools > Database: administração via Prisma Studio
