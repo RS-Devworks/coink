@@ -42,7 +42,7 @@ export default function ForgotPasswordForm() {
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       setSuccess(true)
-    } catch (err) {
+    } catch (_err) {
       setError('Erro ao enviar email de recuperação. Tente novamente.')
     } finally {
       setIsLoading(false)

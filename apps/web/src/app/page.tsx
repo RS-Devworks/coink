@@ -1,7 +1,7 @@
 import Header from "@/components/home/header";
 import Hero from "@/components/home/hero";
 import Features from "@/components/home/features";
-import Benefits from "@/components/home/how-it-works";
+// import Benefits from "@/components/home/how-it-works"; // Componente duplicado
 import Cta from "@/components/home/cta";
 import About from "@/components/home/about";
 import HowItWorks from "@/components/home/how-it-works";

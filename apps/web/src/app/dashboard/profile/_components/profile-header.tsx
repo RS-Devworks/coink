@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Camera, Edit3, MapPin, Calendar } from 'lucide-react'
+import { Camera, Edit3, Calendar } from 'lucide-react'
 import PhotoUpload from './photo-upload'
 import EditProfileDialog from './edit-profile-dialog'
 

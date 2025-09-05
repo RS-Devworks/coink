@@ -1,12 +1,11 @@
 'use server'
 
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-
+import { authOptions } from '../types/auth'
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
 // Tipos para as respostas
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   error?: string
@@ -67,7 +66,7 @@ export async function getUserProfile(): Promise<ApiResponse<UserProfile>> {
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar perfil:', error)
     return { 
       success: false, 
@@ -106,7 +105,7 @@ export async function updateUserProfile(profileData: {
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao atualizar perfil:', error)
     return { 
       success: false, 
@@ -145,7 +144,7 @@ export async function updateUserPassword(passwordData: {
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao alterar senha:', error)
     return { 
       success: false, 
@@ -184,7 +183,7 @@ export async function uploadUserPhoto(photoBase64: string, fileName: string): Pr
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao enviar foto:', error)
     return { 
       success: false, 
@@ -224,7 +223,7 @@ export async function getUserEvents(limit: number = 50, type?: string): Promise<
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar eventos:', error)
     return { 
       success: false, 
@@ -259,7 +258,7 @@ export async function getUserEventStats(): Promise<ApiResponse<EventStats>> {
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar estatísticas:', error)
     return { 
       success: false, 
@@ -293,7 +292,7 @@ export async function deleteUserAccount(): Promise<ApiResponse<{ message: string
     }
 
     return { success: true, data: { message: 'Conta excluída com sucesso' } }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao excluir conta:', error)
     return { 
       success: false, 

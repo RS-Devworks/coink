@@ -1,6 +1,7 @@
 import React from "react";
 import { BlurFade } from "../magicui/blur-fade";
 import { constants } from "@/constants/landing-page";
+import Image from "next/image";
 
 const About = () => {
   return (
@@ -10,9 +11,11 @@ const About = () => {
         duration={constants.BLUR_FADE_TIME}
         inView
       >
-        <img
+        <Image
           alt=""
           src="/pig-bank.jpg"
+          width={800}
+          height={600}
           className="h-full w-full object-cover sm:h-[calc(100%_-_2rem)] sm:self-end rounded-r-4xl"
         />
       </BlurFade>

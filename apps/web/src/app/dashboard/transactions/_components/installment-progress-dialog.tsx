@@ -11,7 +11,7 @@ import { getInstallmentGroup, markInstallmentAsPaid } from '@/server/actions/tra
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { toast } from 'sonner'
-import { Loader2, Calendar, CreditCard, DollarSign } from 'lucide-react'
+import { Loader2, Calendar, CreditCard } from 'lucide-react'
 
 interface InstallmentProgressDialogProps {
   open: boolean
@@ -29,12 +29,6 @@ export default function InstallmentProgressDialog({
   const [installments, setInstallments] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(false)
   const [updating, setUpdating] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (open && groupId) {
-      loadInstallments()
-    }
-  }, [open, groupId])
 
   const loadInstallments = async () => {
     setLoading(true)
@@ -63,6 +57,12 @@ export default function InstallmentProgressDialog({
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (open && groupId) {
+      loadInstallments()
+    }
+  }, [open, groupId, loadInstallments])
 
   const handleTogglePaid = async (installmentId: string, isPaid: boolean) => {
     setUpdating(installmentId)

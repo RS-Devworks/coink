@@ -3,9 +3,17 @@
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { TransactionType } from '@/@types/transaction'
+import { ApiError } from '@/@types/api'
 import axios from 'axios'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+
+function getErrorMessage(error: ApiError): string {
+  const data = error.response?.data
+  if (typeof data === 'string') return data
+  if (Array.isArray(data)) return data.join(', ')
+  return data?.message || 'Erro desconhecido'
+}
 
 export interface CreateCategoryRequest {
   name: string
@@ -32,11 +40,11 @@ export async function getCategories(type?: TransactionType) {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar categorias:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao carregar categorias'
+      error: getErrorMessage(error as ApiError) || 'Erro ao carregar categorias'
     }
   }
 }
@@ -57,11 +65,11 @@ export async function createCategory(data: CreateCategoryRequest) {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao criar categoria:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao criar categoria'
+      error: getErrorMessage(error as ApiError) || 'Erro ao criar categoria'
     }
   }
 }
@@ -82,11 +90,11 @@ export async function setupDefaultCategories() {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao criar categorias padrão:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao criar categorias padrão'
+      error: getErrorMessage(error as ApiError) || 'Erro ao criar categorias padrão'
     }
   }
 }
@@ -107,11 +115,11 @@ export async function updateCategory(id: string, data: Partial<CreateCategoryReq
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao atualizar categoria:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao atualizar categoria'
+      error: getErrorMessage(error as ApiError) || 'Erro ao atualizar categoria'
     }
   }
 }
@@ -132,11 +140,11 @@ export async function deleteCategory(id: string) {
     })
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao deletar categoria:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao deletar categoria'
+      error: getErrorMessage(error as ApiError) || 'Erro ao deletar categoria'
     }
   }
 }

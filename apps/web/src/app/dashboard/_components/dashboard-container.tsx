@@ -9,7 +9,7 @@ import TrendsSection from './sections/trends-section'
 import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 function DashboardSkeleton() {
   return (
@@ -71,7 +71,7 @@ export default function DashboardContainer() {
     data: dashboardData,
     isLoading,
     error,
-    refetch,
+    // refetch, // Para futuras funcionalidades de refresh
   } = useQuery({
     queryKey: ['dashboard-data'],
     queryFn: async () => {

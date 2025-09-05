@@ -8,13 +8,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+// import { Textarea } from "@/components/ui/textarea" // Para futuras funcionalidades
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, Loader2 } from "lucide-react"
 import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
+// import { ptBR } from "date-fns/locale" // Para futuras funcionalidades
 import { cn } from "@/lib/utils"
 import { TransactionType, PaymentMethod, CreateTransactionRequest, Category, Transaction } from '@/@types/transaction'
 import CurrencyInput from '@/components/ui/currency-input'
@@ -27,7 +27,7 @@ const transactionSchema = z.object({
   type: z.enum(['INCOME', 'EXPENSE']),
   paymentMethod: z.enum(['CASH', 'DEBIT_CARD', 'CREDIT_CARD', 'PIX', 'BANK_TRANSFER', 'CHECK', 'BOLETO', 'LOAN']),
   categoryId: z.string().min(1, 'Categoria é obrigatória'),
-  date: z.date({ required_error: "Data é obrigatória" }),
+  date: z.date({ message: "Data é obrigatória" }),
   dueDate: z.date().optional(),
   isPaid: z.boolean().default(true),
   isRecurring: z.boolean().default(false),
@@ -68,7 +68,7 @@ export default function EditTransactionModal({ open, onOpenChange, transaction, 
     setValue,
     watch,
   } = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
+    resolver: zodResolver(transactionSchema) as any,
     defaultValues: {
       description: transaction.description,
       amount: transaction.amount,
@@ -156,7 +156,7 @@ export default function EditTransactionModal({ open, onOpenChange, transaction, 
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="description">Descrição*</Label>
             <Input

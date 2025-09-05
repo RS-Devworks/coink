@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BlurFade } from "../magicui/blur-fade";
 import { constants } from "@/constants/landing-page";
+import Image from "next/image";
 
 const Cta = () => {
   return (
@@ -41,9 +42,11 @@ const Cta = () => {
         duration={constants.BLUR_FADE_TIME}
         inView
       >
-        <img
+        <Image
           alt=""
           src="/technical-analysis-chart-1.jpg"
+          width={800}
+          height={600}
           className="h-full w-full object-cover sm:h-[calc(100%_-_2rem)] sm:self-end rounded-l-4xl"
         />
       </BlurFade>

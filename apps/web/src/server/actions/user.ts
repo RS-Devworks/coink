@@ -1,7 +1,7 @@
 'use server'
 
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '../types/auth'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
@@ -30,7 +30,7 @@ export async function getUserProfile() {
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar perfil:', error)
     return { 
       success: false, 
@@ -68,7 +68,7 @@ export async function updateUserProfile(profileData: {
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao atualizar perfil:', error)
     return { 
       success: false, 
@@ -106,7 +106,7 @@ export async function updateUserPassword(passwordData: {
 
     const data = await response.json()
     return { success: true, data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao alterar senha:', error)
     return { 
       success: false, 
@@ -139,7 +139,7 @@ export async function deleteUserAccount() {
     }
 
     return { success: true, message: 'Conta excluída com sucesso' }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao excluir conta:', error)
     return { 
       success: false, 

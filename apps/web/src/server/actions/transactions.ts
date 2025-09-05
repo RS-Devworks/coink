@@ -3,9 +3,17 @@
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { CreateTransactionRequest, CreateInstallmentTransactionRequest, TransactionFilterParams } from '@/@types/transaction'
+import { ApiError } from '@/@types/api'
 import axios from 'axios'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+
+function getErrorMessage(error: ApiError): string {
+  const data = error.response?.data
+  if (typeof data === 'string') return data
+  if (Array.isArray(data)) return data.join(', ')
+  return data?.message || 'Erro desconhecido'
+}
 
 export async function getTransactions(filters?: TransactionFilterParams) {
   const session = await getSession()
@@ -32,11 +40,12 @@ export async function getTransactions(filters?: TransactionFilterParams) {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar transações:', error)
+    const apiError = error as ApiError
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao carregar transações'
+      error: getErrorMessage(apiError) || 'Erro ao carregar transações'
     }
   }
 }
@@ -57,11 +66,11 @@ export async function createTransaction(data: CreateTransactionRequest) {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao criar transação:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao criar transação'
+      error: getErrorMessage(error as ApiError) || 'Erro ao criar transação'
     }
   }
 }
@@ -92,11 +101,11 @@ export async function createInstallmentTransaction(data: CreateInstallmentTransa
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao criar transação parcelada:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao criar transação parcelada'
+      error: getErrorMessage(error as ApiError) || 'Erro ao criar transação parcelada'
     }
   }
 }
@@ -117,11 +126,11 @@ export async function updateTransaction(id: string, data: Partial<CreateTransact
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao atualizar transação:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao atualizar transação'
+      error: getErrorMessage(error as ApiError) || 'Erro ao atualizar transação'
     }
   }
 }
@@ -142,11 +151,11 @@ export async function getMonthlyTransactionSummary(year: number, month: number) 
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar resumo mensal:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao carregar resumo mensal'
+      error: getErrorMessage(error as ApiError) || 'Erro ao carregar resumo mensal'
     }
   }
 }
@@ -167,11 +176,11 @@ export async function getInstallmentGroup(groupId: string) {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar grupo de parcelas:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao carregar parcelas'
+      error: getErrorMessage(error as ApiError) || 'Erro ao carregar parcelas'
     }
   }
 }
@@ -192,11 +201,11 @@ export async function markInstallmentAsPaid(id: string, isPaid: boolean) {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao atualizar status de pagamento:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao atualizar status'
+      error: getErrorMessage(error as ApiError) || 'Erro ao atualizar status'
     }
   }
 }
@@ -217,11 +226,11 @@ export async function deleteTransaction(id: string) {
     })
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao deletar transação:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao deletar transação'
+      error: getErrorMessage(error as ApiError) || 'Erro ao deletar transação'
     }
   }
 }
@@ -242,11 +251,11 @@ export async function editTransaction(id: string, data: Partial<CreateTransactio
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao editar transação:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao editar transação'
+      error: getErrorMessage(error as ApiError) || 'Erro ao editar transação'
     }
   }
 }
@@ -267,11 +276,11 @@ export async function deleteInstallmentGroup(groupId: string) {
     })
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao deletar grupo de parcelas:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao deletar parcelas'
+      error: getErrorMessage(error as ApiError) || 'Erro ao deletar parcelas'
     }
   }
 }
@@ -292,11 +301,11 @@ export async function getDashboardData() {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar dados do dashboard:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao carregar dashboard'
+      error: getErrorMessage(error as ApiError) || 'Erro ao carregar dashboard'
     }
   }
 }
@@ -326,11 +335,11 @@ export async function getTableData(filters?: TransactionFilterParams) {
     })
 
     return { success: true, data: response.data }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao buscar dados da tabela:', error)
     return {
       success: false,
-      error: error.response?.data?.message || 'Erro ao carregar tabela'
+      error: getErrorMessage(error as ApiError) || 'Erro ao carregar tabela'
     }
   }
 }

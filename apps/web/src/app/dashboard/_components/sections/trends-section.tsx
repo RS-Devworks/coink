@@ -2,14 +2,25 @@ import { memo } from 'react'
 import CategoryTrendsChart from '../charts/category-trends-chart'
 import IncomeTrendsChart from '../charts/income-trends-chart'
 
+interface ChartDataPoint extends Record<string, string | number> {
+  name: string
+  value: number
+}
+
+interface CategoryData {
+  id: string
+  name: string
+  color: string
+}
+
 interface TrendsSectionProps {
   categoryTrends: {
-    chartData: any[]
-    categories: any[]
+    chartData: ChartDataPoint[]
+    categories: CategoryData[]
   }
   incomeTrends: {
-    chartData: any[]
-    categories: any[]
+    chartData: ChartDataPoint[]
+    categories: CategoryData[]
   }
 }
 

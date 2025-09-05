@@ -8,14 +8,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+// import { Textarea } from "@/components/ui/textarea" // Para futuras funcionalidades
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, Loader2, PlusCircle, CreditCard } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
+// import { ptBR } from "date-fns/locale" // Para futuras funcionalidades
 import { cn } from "@/lib/utils"
 import { TransactionType, PaymentMethod, CreateTransactionRequest, Category } from '@/@types/transaction'
 import CurrencyInput from '@/components/ui/currency-input'

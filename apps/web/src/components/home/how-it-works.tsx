@@ -3,13 +3,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { BlurFade } from "../magicui/blur-fade";
 import { constants } from "@/constants/landing-page";
 import { Safari } from "../magicui/safari";
-import { User, Lock, ChartBar, BadgeDollarSign, ChartLine } from "lucide-react";
+import { User, BadgeDollarSign, ChartLine } from "lucide-react";
 
 interface StepProps {
   title: string;

@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { DollarSign } from "lucide-react"
+// import { DollarSign } from "lucide-react" // Para futuras funcionalidades
 import Link from "next/link"
 
 const data = {

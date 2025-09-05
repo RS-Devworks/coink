@@ -36,7 +36,7 @@ export default function LoginForm() {
     setIsLoading(true)
     setError(null)
 
-    const loginStartTime = Date.now()
+    // const loginStartTime = Date.now() // Para futuras métricas de performance
 
     try {
       const { signIn } = await import('next-auth/react')
@@ -51,7 +51,7 @@ export default function LoginForm() {
       } else if (result?.ok) {
         window.location.href = '/dashboard'
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Erro ao fazer login. Tente novamente.')
     } finally {
       setIsLoading(false)

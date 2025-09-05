@@ -63,7 +63,7 @@ export default function RegisterForm() {
       } else {
         setError(result.error || 'Erro ao criar conta.')
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Erro ao criar conta. Tente novamente.')
     } finally {
       setIsLoading(false)

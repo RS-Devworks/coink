@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { getUserProfile, updateUserProfile, updateUserPassword, deleteUserAccount } from '@/server/actions/profile'
 import ProfileHeader from './profile-header'
 import ProfileTabs from './profile-tabs'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 interface UserProfile {
   id: string
@@ -55,7 +55,7 @@ function ProfileSkeleton() {
 
 export default function ProfileContainer() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: _session, status } = useSession()
   const queryClient = useQueryClient()
 
   // Buscar dados do perfil

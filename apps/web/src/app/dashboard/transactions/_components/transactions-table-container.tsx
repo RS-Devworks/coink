@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { DataTable } from './data-table'
-import { Transaction, TransactionFilterParams, TransactionType } from '@/@types/transaction'
+import { TransactionFilterParams, TransactionType } from '@/@types/transaction'
 import { getTableData } from '@/server/actions/transactions'
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

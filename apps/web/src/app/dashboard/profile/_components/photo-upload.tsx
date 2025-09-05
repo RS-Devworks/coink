@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Camera, Upload, X, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { uploadUserPhoto } from '@/server/actions/profile'
+import Image from 'next/image'
 
 interface PhotoUploadProps {
   currentPhotoUrl?: string
@@ -234,9 +235,11 @@ export default function PhotoUpload({
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
-                <img
+                <Image
                   src={previewUrl}
                   alt="Preview"
+                  width={64}
+                  height={64}
                   className="w-16 h-16 rounded-lg object-cover"
                 />
                 <div className="flex-1">

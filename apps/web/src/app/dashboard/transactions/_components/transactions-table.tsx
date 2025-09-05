@@ -11,10 +11,9 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { PlusCircle, Search, Filter } from "lucide-react"
+import { Search } from "lucide-react"
 import { TransactionType } from '@/@types/transaction'
 import AddTransactionModal from '@/components/add-transaction-modal'
 

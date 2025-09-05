@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useState, useImperativeHandle, ChangeEvent, KeyboardEvent } from 'react'
+import { forwardRef, useState, useRef, useImperativeHandle, ChangeEvent, KeyboardEvent } from 'react'
 import { Input } from './input'
 import { cn } from '@/lib/utils'
 
@@ -28,7 +28,7 @@ const CurrencyInput = forwardRef<CurrencyInputRef, CurrencyInputProps>(
     const [rawValue, setRawValue] = useState(value)
     
     // Referência para o input interno
-    const inputRef = useState<HTMLInputElement | null>(null)
+    const inputRef = useRef<HTMLInputElement | null>(null)
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
