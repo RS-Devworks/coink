@@ -1,0 +1,94 @@
+title Coink - Diagrama de Casos de Uso
+
+// Actors
+User [icon: user, color: blue, label: "Usuário"]
+Guest [icon: user-circle, color: gray, label: "Visitante"]
+System [icon: server, color: green, label: "Sistema"]
+
+// Authentication Use Cases
+Authentication {
+  Register [icon: user-plus, color: green, label: "Cadastrar Usuário"]
+  Login [icon: sign-in, color: blue, label: "Fazer Login"]
+  Logout [icon: sign-out, color: red, label: "Fazer Logout"]
+  RecoverPassword [icon: key, color: orange, label: "Recuperar Senha"]
+  UpdateProfile [icon: user-edit, color: purple, label: "Atualizar Perfil"]
+}
+
+// Financial Management Use Cases
+FinancialManagement {
+  ViewDashboard [icon: dashboard, color: blue, label: "Visualizar Dashboard"]
+  AddTransaction [icon: plus, color: green, label: "Adicionar Transação"]
+  EditTransaction [icon: edit, color: yellow, label: "Editar Transação"]
+  DeleteTransaction [icon: trash, color: red, label: "Excluir Transação"]
+  ViewTransactions [icon: list, color: gray, label: "Visualizar Transações"]
+  FilterTransactions [icon: filter, color: purple, label: "Filtrar Transações"]
+}
+
+// Category Management Use Cases
+CategoryManagement {
+  CreateCategory [icon: tag-plus, color: green, label: "Criar Categoria"]
+  EditCategory [icon: tag-edit, color: yellow, label: "Editar Categoria"]
+  DeleteCategory [icon: tag-delete, color: red, label: "Excluir Categoria"]
+  ViewCategories [icon: tags, color: blue, label: "Visualizar Categorias"]
+}
+
+// Reports and Analytics Use Cases
+ReportsAnalytics {
+  GenerateReport [icon: chart-bar, color: green, label: "Gerar Relatório"]
+  ViewInsights [icon: lightbulb, color: yellow, label: "Visualizar Insights"]
+  ExportData [icon: download, color: blue, label: "Exportar Dados"]
+}
+
+// System Use Cases
+SystemManagement {
+  TrackEvents [icon: activity, color: gray, label: "Rastrear Eventos"]
+  ManageSessions [icon: clock, color: purple, label: "Gerenciar Sessões"]
+  BackupData [icon: save, color: orange, label: "Backup de Dados"]
+}
+
+// Landing Page Use Cases
+LandingPage {
+  ViewLanding [icon: home, color: blue, label: "Visualizar Landing Page"]
+  LearnFeatures [icon: info, color: green, label: "Conhecer Funcionalidades"]
+}
+
+// Relationships - User
+User > Register: "executa"
+User > Login: "executa"
+User > Logout: "executa"
+User > RecoverPassword: "executa"
+User > UpdateProfile: "executa"
+User > ViewDashboard: "executa"
+User > AddTransaction: "executa"
+User > EditTransaction: "executa"
+User > DeleteTransaction: "executa"
+User > ViewTransactions: "executa"
+User > FilterTransactions: "executa"
+User > CreateCategory: "executa"
+User > EditCategory: "executa"
+User > DeleteCategory: "executa"
+User > ViewCategories: "executa"
+User > GenerateReport: "executa"
+User > ViewInsights: "executa"
+User > ExportData: "executa"
+
+// Relationships - Guest
+Guest > ViewLanding: "executa"
+Guest > LearnFeatures: "executa"
+Guest > Register: "executa"
+Guest > Login: "executa"
+
+// Relationships - System
+System > TrackEvents: "executa automaticamente"
+System > ManageSessions: "executa automaticamente"
+System > BackupData: "executa automaticamente"
+System > Register: "valida e processa"
+System > Login: "autentica"
+System > RecoverPassword: "processa"
+System > AddTransaction: "persiste"
+System > EditTransaction: "atualiza"
+System > DeleteTransaction: "remove"
+System > CreateCategory: "persiste"
+System > EditCategory: "atualiza"
+System > DeleteCategory: "remove"
+System > GenerateReport: "processa dados"

@@ -1,0 +1,103 @@
+title Coink - Diagrama de Classes (Modelo de Dados)
+
+// Core User Entity
+User [icon: user, color: blue] {
+  id string pk
+  email string unique
+  name string
+  password string
+  profilePhoto string
+  lastAccess datetime
+  createdAt datetime
+  updatedAt datetime
+}
+
+// Financial Categories
+Category [icon: tag, color: green] {
+  id string pk
+  name string
+  description string
+  color string
+  icon string
+  type string
+  isDefault boolean
+  userId string fk
+  createdAt datetime
+  updatedAt datetime
+}
+
+// Financial Transactions
+Transaction [icon: dollar, color: yellow] {
+  id string pk
+  description string
+  amount float
+  type string
+  paymentMethod string
+  date datetime
+  dueDate datetime
+  isPaid boolean
+  isRecurring boolean
+  recurringDay int
+  isInstallment boolean
+  installmentNum int
+  totalInstallments int
+  installmentGroupId string
+  interestRate float
+  taxRate float
+  originalAmount float
+  userId string fk
+  categoryId string fk
+  createdAt datetime
+  updatedAt datetime
+}
+
+// Event Tracking
+EventLog [icon: chart, color: gray] {
+  id string pk
+  type string
+  sessionId string
+  metadata string
+  timestamp datetime
+  serverTimestamp datetime
+  ip string
+  userAgent string
+  userId string fk
+  createdAt datetime
+  updatedAt datetime
+}
+
+// Enums
+TransactionType [icon: list, color: orange] {
+  INCOME
+  EXPENSE
+}
+
+PaymentMethod [icon: credit-card, color: purple] {
+  CASH
+  DEBIT_CARD
+  CREDIT_CARD
+  PIX
+  BANK_TRANSFER
+  CHECK
+  BOLETO
+  LOAN
+}
+
+EventType [icon: activity, color: red] {
+  LOGIN
+  LOGOUT
+  PROFILE_UPDATE
+  PHOTO_UPLOAD
+  NAVIGATION
+  ACTION
+}
+
+// Relationships
+User.id < Category.userId
+User.id < Transaction.userId
+User.id < EventLog.userId
+Category.id < Transaction.categoryId
+TransactionType - Category.type
+TransactionType - Transaction.type
+PaymentMethod - Transaction.paymentMethod
+EventType - EventLog.type

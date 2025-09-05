@@ -1,0 +1,72 @@
+title Coink - Fluxograma: Jornada do Usuário
+
+// Entry Points
+LandingPage [icon: home, color: blue, label: "Landing Page\nVisita inicial"]
+DirectAccess [icon: link, color: purple, label: "Acesso direto\n(bookmark/URL)"]
+
+// Authentication Flow
+IsLoggedIn [icon: question, color: yellow, label: "Usuário está\nlogado?"]
+LoginForm [icon: sign-in, color: green, label: "Formulário\nde Login"]
+RegisterForm [icon: user-plus, color: green, label: "Formulário\nde Registro"]
+
+// Main Application
+Dashboard [icon: dashboard, color: cyan, label: "Dashboard\nPrincipal"]
+Transactions [icon: list, color: blue, label: "Lista de\nTransações"]
+Categories [icon: tags, color: orange, label: "Gerenciar\nCategorias"]
+Reports [icon: chart-bar, color: purple, label: "Relatórios\ne Insights"]
+Profile [icon: user, color: gray, label: "Perfil do\nUsuário"]
+
+// Actions
+AddTransaction [icon: plus, color: green, label: "Adicionar\nTransação"]
+EditTransaction [icon: edit, color: yellow, label: "Editar\nTransação"]
+DeleteTransaction [icon: trash, color: red, label: "Excluir\nTransação"]
+FilterData [icon: filter, color: blue, label: "Filtrar\nDados"]
+ExportData [icon: download, color: purple, label: "Exportar\nDados"]
+
+// Decision Points
+HasTransactions [icon: question, color: yellow, label: "Usuário tem\ntransações?"]
+WantsToAdd [icon: question, color: yellow, label: "Quer adicionar\nnova transação?"]
+WantsReports [icon: question, color: yellow, label: "Quer ver\nrelatórios?"]
+
+// Flow from Landing Page
+LandingPage > IsLoggedIn: "Usuário navega"
+DirectAccess > IsLoggedIn: "Acesso direto"
+
+IsLoggedIn > LoginForm: "Não logado"
+IsLoggedIn > Dashboard: "Logado"
+
+LoginForm > RegisterForm: "Clica em 'Registrar'"
+RegisterForm > Dashboard: "Registro bem-sucedido"
+LoginForm > Dashboard: "Login bem-sucedido"
+
+// Main Application Flow
+Dashboard > HasTransactions: "Usuário no dashboard"
+
+HasTransactions > Transactions: "Tem transações"
+HasTransactions > WantsToAdd: "Não tem transações"
+
+WantsToAdd > AddTransaction: "Quer adicionar"
+WantsToAdd > Categories: "Não quer adicionar"
+
+AddTransaction > Dashboard: "Transação criada"
+
+// Navigation Flow
+Dashboard > Transactions: "Clica em 'Ver Transações'"
+Dashboard > Categories: "Clica em 'Categorias'"
+Dashboard > Reports: "Clica em 'Relatórios'"
+Dashboard > Profile: "Clica em 'Perfil'"
+
+Transactions > EditTransaction: "Clica em editar"
+Transactions > DeleteTransaction: "Clica em excluir"
+Transactions > FilterData: "Aplica filtros"
+Transactions > Dashboard: "Volta ao dashboard"
+
+Categories > Dashboard: "Volta ao dashboard"
+Reports > ExportData: "Exporta dados"
+Reports > Dashboard: "Volta ao dashboard"
+Profile > Dashboard: "Volta ao dashboard"
+
+// Reports Flow
+Reports > WantsReports: "Usuário em relatórios"
+WantsReports > Reports: "Continua navegando"
+WantsReports > Dashboard: "Volta ao dashboard"

@@ -1,0 +1,69 @@
+direction right
+title Coink - Arquitetura do Sistema de Gestão Financeira
+
+// Infraestrutura principal
+Development [icon: code] {
+  Turborepo [icon: package, label: "Turborepo Monorepo"]
+  Docker [icon: docker] {
+    WebApp [icon: nextdotjs, label: "Next.js 15.5.0 Frontend"]
+    API [icon: nest, label: "NestJS Backend API"]
+    Database [icon: sqlite, label: "SQLite Database"]
+
+    // Componentes internos do Backend
+    BackendStack [icon: nestjs, label: "Backend Stack"] {
+      Prisma [icon: prisma, label: "Prisma ORM"]
+      AuthJWT [icon: lock, label: "Autenticação JWT"]
+      Bcrypt [icon: shield, label: "Hash de Senhas"]
+      Events [icon: activity-square, label: "Log de Eventos"]
+    }
+    
+    // Componentes internos do Frontend
+    UIStack [icon: nextdotjs, label: "Frontend Stack"] {
+      React [icon: react, label: "React 19"]
+      TailwindCSS [icon: tailwind-css, label: "TailwindCSS v4"]
+      ServerActions [icon: server, label: "Next.js Server Actions"]
+      ContextAPI [icon: context, label: "React Context"]
+    }
+  }
+}
+
+// Serviços externos
+ExternalServices {
+  EmailProvider [icon: mail, label: "Email Provider\n(Recuperação de Senha)"]
+  FileStorage [icon: folder, label: "Armazenamento\n(Profile Photos)"]
+}
+
+// Ferramentas de desenvolvimento
+DevTools {
+  PrismaStudio [icon: database, label: "Prisma Studio\nDatabase Admin"]
+  VSCode [icon: vscode, label: "VS Code\nDevelopment"]
+  pnpm [icon: package, label: "pnpm\nPackage Manager"]
+}
+
+// Conexões de infraestrutura
+Turborepo > Docker: orquestração do monorepo
+Docker > WebApp: container frontend
+Docker > API: container backend
+Docker > Database: container database
+
+// Roteamento interno
+WebApp > API: chamadas autenticadas para API
+API > Prisma: acesso a dados via ORM
+Prisma > Database: queries e transações
+
+// Autenticação e segurança
+API > AuthJWT: emissão e validação de tokens
+API > Bcrypt: hash e verificação de senhas
+API > Events: log de eventos do sistema
+
+// UI e cliente
+WebApp > UIStack: componentes React
+UIStack > ServerActions: server actions Next.js
+
+// Serviços externos
+API > EmailProvider: envio de emails
+API > FileStorage: armazenamento de arquivos
+
+// Ferramentas de desenvolvimento
+DevTools > Database: administração via Prisma Studio
+DevTools > Turborepo: gerenciamento de build

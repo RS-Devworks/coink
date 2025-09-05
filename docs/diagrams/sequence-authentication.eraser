@@ -1,0 +1,52 @@
+title Coink - Fluxo de Autenticação (Login/Registro)
+
+User [icon: user] > Frontend [icon: nextdotjs]: Acessa aplicação
+Frontend > User: Exibe landing page
+
+alt Usuário escolhe "Registrar"
+  User > Frontend: Preenche formulário de registro
+  Frontend > API [icon: nestjs]: POST /auth/register
+  API > Database [icon: sqlite]: Verifica se email já existe
+  
+  alt Email não existe
+    API > Database: Cria novo usuário
+    API > Database: Hash da senha com bcrypt
+    Database > API: Usuário criado com sucesso
+    API > JWT [icon: key]: Gera token de acesso
+    JWT > API: Token JWT
+    API > Frontend: 201 Created + token + user data
+    Frontend > User: Redireciona para dashboard
+  else Email já existe
+    Database > API: Email duplicado
+    API > Frontend: 409 Conflict
+    Frontend > User: Exibe erro "Email já cadastrado"
+  end
+
+else Usuário escolhe "Login"
+  User > Frontend: Preenche credenciais
+  Frontend > API: POST /auth/login
+  API > Database: Busca usuário por email
+  
+  alt Credenciais válidas
+    Database > API: Dados do usuário
+    API > bcrypt [icon: shield]: Verifica senha
+    bcrypt > API: Senha válida
+    API > Database: Atualiza lastAccess
+    API > JWT: Gera token de acesso
+    JWT > API: Token JWT
+    API > Frontend: 200 OK + token + user data
+    Frontend > User: Redireciona para dashboard
+  else Credenciais inválidas
+    Database > API: Usuário não encontrado
+    API > Frontend: 401 Unauthorized
+    Frontend > User: Exibe erro "Credenciais inválidas"
+  end
+end
+
+opt Usuário logado acessa área protegida
+  Frontend > API: Request com Authorization header
+  API > JWT: Valida token
+  JWT > API: Token válido
+  API > Frontend: Dados solicitados
+  Frontend > User: Exibe conteúdo protegido
+end

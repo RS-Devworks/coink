@@ -1,0 +1,60 @@
+title Coink - Fluxograma: Processo de Criação de Transação
+
+// Start
+Start [icon: play, color: green, label: "Usuário clica em\n'Adicionar Transação'"]
+
+// Decision Points
+HasCategory [icon: question, color: yellow, label: "Categoria\nexiste?"]
+IsValidAmount [icon: question, color: yellow, label: "Valor é\nválido?"]
+IsInstallment [icon: question, color: yellow, label: "É transação\nparcelada?"]
+IsRecurring [icon: question, color: yellow, label: "É transação\nrecorrente?"]
+
+// Actions
+CreateCategory [icon: tag-plus, color: blue, label: "Criar nova\ncategoria"]
+ValidateData [icon: check, color: blue, label: "Validar dados\nda transação"]
+CreateTransaction [icon: plus, color: green, label: "Criar transação\nno banco"]
+CreateInstallments [icon: list, color: purple, label: "Criar parcelas\nindividualmente"]
+SetRecurring [icon: repeat, color: orange, label: "Configurar\nrecorrência"]
+LogEvent [icon: activity, color: gray, label: "Registrar evento\nno log"]
+UpdateDashboard [icon: dashboard, color: cyan, label: "Atualizar\ndashboard"]
+
+// Error States
+ShowError [icon: exclamation, color: red, label: "Exibir erro\nao usuário"]
+
+// Success State
+ShowSuccess [icon: check-circle, color: green, label: "Exibir sucesso\ne redirecionar"]
+
+// End
+End [icon: stop, color: red, label: "Fim do processo"]
+
+// Flow
+Start > HasCategory: "Verificar categoria"
+
+HasCategory > CreateCategory: "Não"
+HasCategory > IsValidAmount: "Sim"
+
+CreateCategory > IsValidAmount: "Após criar"
+
+IsValidAmount > ShowError: "Não"
+IsValidAmount > ValidateData: "Sim"
+
+ValidateData > IsInstallment: "Dados válidos"
+
+IsInstallment > CreateInstallments: "Sim"
+IsInstallment > IsRecurring: "Não"
+
+CreateInstallments > IsRecurring: "Parcelas criadas"
+
+IsRecurring > SetRecurring: "Sim"
+IsRecurring > CreateTransaction: "Não"
+
+SetRecurring > CreateTransaction: "Recorrência configurada"
+
+CreateTransaction > LogEvent: "Transação criada"
+
+LogEvent > UpdateDashboard: "Evento registrado"
+
+UpdateDashboard > ShowSuccess: "Dashboard atualizado"
+
+ShowSuccess > End: "Processo concluído"
+ShowError > End: "Processo finalizado com erro"
