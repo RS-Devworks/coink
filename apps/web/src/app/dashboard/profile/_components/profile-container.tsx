@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {useRouter} from 'next/router'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { getUserProfile, updateUserProfile, updateUserPassword, deleteUserAccount } from '@/server/actions/profile'
 import ProfileHeader from './profile-header'
